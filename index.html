@@ -57,6 +57,74 @@ canvas{display:block;position:fixed;top:0;left:0}
 .ebar{position:absolute;width:54px;height:6px;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.15);border-radius:3px;overflow:hidden;transform:translate(-50%,-50%)}
 .ebar-f{height:100%;background:linear-gradient(90deg,#ff2020,#ff6020);transition:width .2s;border-radius:3px}
 
+/* Egg collection counter */
+#egg-hud{
+position:absolute;top:12px;left:50%;transform:translateX(-50%);
+display:flex;gap:8px;align-items:center;
+pointer-events:none;
+}
+.epanel{
+background:linear-gradient(135deg,rgba(0,30,50,.88),rgba(0,15,30,.78));
+border:1px solid rgba(80,220,255,.25);border-radius:10px;
+padding:6px 14px;backdrop-filter:blur(6px);
+box-shadow:0 4px 18px rgba(0,0,0,.5);
+color:#80DDFF;font-size:10px;letter-spacing:2px;text-align:center;
+white-space:nowrap;
+}
+.epanel .eval{font-size:18px;font-weight:900;display:block;line-height:1.1;color:#A0EEFF}
+.epanel .elbl{font-size:8px;letter-spacing:2px;opacity:.6;text-transform:uppercase}
+
+/* Intro safe-zone landing sequence */
+#intro-overlay{
+position:absolute;inset:0;pointer-events:none;
+background:rgba(0,30,20,.75);
+display:flex;flex-direction:column;align-items:center;justify-content:center;
+transition:opacity 1.8s ease;
+z-index:5;
+}
+#intro-overlay.hidden{opacity:0;pointer-events:none}
+#intro-msg{
+font-size:clamp(20px,4vw,34px);font-weight:900;letter-spacing:4px;
+color:#88FFCC;text-shadow:0 0 40px rgba(0,255,150,.9);
+text-align:center;line-height:1.5;padding:0 24px;
+}
+#intro-sub{
+margin-top:12px;font-size:13px;letter-spacing:2px;
+color:rgba(200,255,230,.6);text-align:center;
+}
+
+/* Safe zone banner */
+#safezone{
+position:absolute;top:50%;left:50%;transform:translate(-50%,60px);
+font-size:13px;letter-spacing:3px;font-weight:700;
+color:#88FFCC;text-shadow:0 0 20px rgba(0,255,150,.8);
+background:rgba(0,40,20,.6);backdrop-filter:blur(8px);
+padding:6px 18px;border-radius:8px;
+border:1px solid rgba(0,255,150,.25);
+opacity:0;pointer-events:none;transition:opacity .5s;
+white-space:nowrap;
+}
+/* Cave overlay darkening */
+#cave-overlay{
+position:absolute;inset:0;pointer-events:none;
+background:rgba(0,0,0,0);transition:background 1.2s;
+}
+/* Treasure quest tracker */
+#quest{
+position:absolute;bottom:200px;left:50%;transform:translateX(-50%);
+display:flex;gap:10px;align-items:center;
+}
+.qpanel{
+background:linear-gradient(135deg,rgba(60,40,0,.88),rgba(30,20,0,.78));
+border:1px solid rgba(255,210,0,.3);border-radius:10px;
+padding:6px 14px;backdrop-filter:blur(6px);
+box-shadow:0 4px 18px rgba(0,0,0,.5);
+color:#FFD140;font-size:10px;letter-spacing:2px;text-align:center;
+white-space:nowrap;
+}
+.qpanel .qval{font-size:18px;font-weight:900;display:block;line-height:1.1}
+.qpanel .qlbl{font-size:8px;letter-spacing:2px;opacity:.6;text-transform:uppercase}
+
 /* ═══ MOBILE JOYSTICK CONTROLS ═══ */
 #controls{position:fixed;inset:0;pointer-events:none;z-index:20}
 
@@ -232,6 +300,26 @@ padding:20px;overflow-y:auto;
   <div id="mmw"><canvas id="mm" width="130" height="130"></canvas></div>
   <div id="mode">🐉 Flying</div>
 
+  <!-- Dragon egg counter -->
+
+  <div id="egg-hud">
+    <div class="epanel">
+      <span class="eval" id="egg-count">0</span>
+      <span class="elbl">🥚 Eggs</span>
+    </div>
+    <div class="epanel" style="border-color:rgba(255,200,80,.2);color:#FFE080">
+      <span class="eval" id="egg-total" style="color:#FFE080">0</span>
+      <span class="elbl">Total Eggs</span>
+    </div>
+  </div>
+
+  <!-- Intro landing overlay -->
+
+  <div id="intro-overlay">
+    <div id="intro-msg">🐉 Welcome, Dragon Rider<br>You have landed in a Safe Zone</div>
+    <div id="intro-sub">Collect dragon eggs · Find treasure · Slay enemy dragons · Fly through hoops</div>
+  </div>
+
   <div id="xhair"><div class="xring"></div><div class="xdot"></div></div>
   <div id="popup"></div>
   <div id="wbanner"></div>
@@ -239,6 +327,21 @@ padding:20px;overflow-y:auto;
   <div id="dmg"></div>
   <div id="vig"></div>
   <div id="puf"></div>
+  <div id="cave-overlay"></div>
+  <div id="safezone">⛨ SAFE ZONE — Resting</div>
+
+  <!-- Treasure quest tracker -->
+
+  <div id="quest">
+    <div class="qpanel">
+      <span class="qval" id="tres-found">0</span>
+      <span class="qlbl">Treasure</span>
+    </div>
+    <div class="qpanel" style="border-color:rgba(100,255,180,.2);color:#88FFCC">
+      <span class="qval" id="tres-total" style="color:#88FFCC">0</span>
+      <span class="qlbl">Total Chests</span>
+    </div>
+  </div>
 </div>
 
 <!-- CONTROLS OVERLAY -->
@@ -285,8 +388,9 @@ padding:20px;overflow-y:auto;
     <div><span class="k">🛬 LAND / L</span><br>Land &amp; explore</div>
     <div><span class="k">🛫 TAKEOFF / F</span><br>Launch into sky</div>
   </div>
-  <p class="hints">⭐ Fly through golden hoops +100 &nbsp;•&nbsp; 🔥 Slay dragons +500×wave &nbsp;•&nbsp; 💊 Orbs restore HP &amp; fire</p>
-  <p class="warn">⚠ Enemy dragons shoot fire back! More enemies each wave. Survive!</p>
+  <p class="hints">⭐ Hoops +100 &nbsp;•&nbsp; 🔥 Slay dragons +500×wave &nbsp;•&nbsp; 💊 Orbs: HP &amp; fire &nbsp;•&nbsp; 💰 Chests +300 &amp; bonus</p>
+  <p class="hints" style="color:rgba(100,255,180,.7)">🏔 Explore caves to find hidden treasure &nbsp;•&nbsp; ⛨ Safe zones heal you &amp; pause enemies</p>
+  <p class="warn">⚠ Enemy dragons shoot fire back! Seek safe zones to recover. Collect all treasure chests!</p>
   <div class="cta">— TAP TO MOUNT YOUR DRAGON —</div>
 </div>
 
@@ -341,6 +445,16 @@ function sfxBoom()    { playNoise(0.7, 0.9, 600); playTone(70, 'sawtooth', 0.5, 
 function sfxHoop()    { [523,659,784,1047].forEach((f,i)=>setTimeout(()=>playTone(f,'sine',0.15,0.2),i*55)); }
 function sfxHit()     { playTone(160,'square',0.1,0.3,(o,ac)=>o.frequency.exponentialRampToValueAtTime(70,ac.currentTime+0.1)); }
 function sfxPickup()  { [400,700,1100].forEach((f,i)=>setTimeout(()=>playTone(f,'sine',0.12,0.18),i*45)); }
+function sfxTreasure(){ [300,500,800,1200,1600].forEach((f,i)=>setTimeout(()=>playTone(f,'sine',0.22,0.22),i*70)); }
+function sfxSafeZone(){ [220,330,440].forEach((f,i)=>setTimeout(()=>playTone(f,'sine',0.4,0.1),i*180)); }
+function sfxCaveEnter(){ playTone(80,'sawtooth',0.5,0.08,(o,ac)=>{o.frequency.exponentialRampToValueAtTime(50,ac.currentTime+0.5);}); }
+function sfxEggCollect(){ [260,400,560,780].forEach((f,i)=>setTimeout(()=>playTone(f,'triangle',0.25,0.22),i*60)); }
+function sfxHatch(){
+  // Crack + cute squeak
+  playNoise(0.08, 0.35, 2000);
+  setTimeout(function(){ [480,640,800,1040].forEach(function(f,i){ setTimeout(function(){ playTone(f,'triangle',0.18,0.25); }, i*55); }); }, 120);
+}
+function sfxBabyFire(){ playTone(300,'sawtooth',0.08,0.18,(o,ac)=>{ o.frequency.exponentialRampToValueAtTime(120,ac.currentTime+0.08); }); }
 
 // ════════════════════════════════════════════════════════
 //  RENDERER
@@ -760,10 +874,141 @@ function buildRider() {
 }
 
 // ════════════════════════════════════════════════════════
+//  BABY DRAGON BUILDER
+// ════════════════════════════════════════════════════════
+var babyDragons = [];   // hatched companions
+var EGG_RARITY_COLS = [
+  { pri: 0x2A8C1A, sec: 0x0A4A00 },  // green
+  { pri: 0x8A1A9C, sec: 0x4A0060 },  // purple
+  { pri: 0xCC6800, sec: 0x883200 },  // orange
+  { pri: 0x1A4AAA, sec: 0x0A2260 },  // blue
+  { pri: 0xAA1818, sec: 0x660000 },  // red (rare)
+];
+
+function buildBabyDragon(rarityIdx) {
+  var cols = EGG_RARITY_COLS[rarityIdx] || EGG_RARITY_COLS[0];
+  var g = new THREE.Group();
+  var pM = new THREE.MeshLambertMaterial({ color: cols.pri });
+  var sM = new THREE.MeshLambertMaterial({ color: cols.sec });
+  var bM = new THREE.MeshLambertMaterial({ color: 0xFFEECC });
+  var wM = new THREE.MeshLambertMaterial({ color: cols.pri, side: THREE.DoubleSide, transparent: true, opacity: 0.82 });
+  var SC = 0.28; // baby is 28% size of full dragon
+
+  // Body
+  var body = new THREE.Mesh(new THREE.CylinderGeometry(2.8*SC, 3.8*SC, 16*SC, 8), pM);
+  body.rotation.x = Math.PI / 2; g.add(body);
+  var belly = new THREE.Mesh(new THREE.CylinderGeometry(2.1*SC, 3.1*SC, 12*SC, 7), bM);
+  belly.rotation.x = Math.PI / 2; belly.position.set(0, -1.8*SC, 0); g.add(belly);
+
+  // Neck + head
+  var neck = new THREE.Mesh(new THREE.CylinderGeometry(1.6*SC, 2.2*SC, 7*SC, 6), pM);
+  neck.position.set(0, 2.8*SC, 10*SC); neck.rotation.x = -Math.PI / 5; g.add(neck);
+
+  var hg = new THREE.Group();
+  hg.add(new THREE.Mesh(new THREE.BoxGeometry(4*SC, 3*SC, 4.5*SC), pM));
+  var snout = new THREE.Mesh(new THREE.BoxGeometry(3*SC, 2*SC, 5*SC), pM);
+  snout.position.set(0, -0.3*SC, 4.5*SC); hg.add(snout);
+
+  // Big cute eyes
+  var eyeM = new THREE.MeshBasicMaterial({ color: 0xFF8C00 });
+  [-1,1].forEach(function(s) {
+    var eye = new THREE.Mesh(new THREE.SphereGeometry(0.72*SC, 7, 6), eyeM);
+    eye.position.set(s*1.8*SC, 1.1*SC, 1.8*SC); hg.add(eye);
+    var shine = new THREE.Mesh(new THREE.SphereGeometry(0.28*SC, 5, 4),
+      new THREE.MeshBasicMaterial({ color: 0xFFFFFF }));
+    shine.position.set(s*2.0*SC, 1.3*SC, 2.1*SC); hg.add(shine);
+  });
+  // Tiny horns
+  [-1,1].forEach(function(s) {
+    var horn = new THREE.Mesh(new THREE.ConeGeometry(0.28*SC, 2*SC, 4),
+      new THREE.MeshLambertMaterial({ color: 0x1a1a1a }));
+    horn.position.set(s*1.5*SC, 2.0*SC, 0); horn.rotation.z = s*0.4; hg.add(horn);
+  });
+  hg.position.set(0, 5.5*SC, 14*SC); g.add(hg); g.headGroup = hg;
+
+  // Wings
+  function mkWing(side) {
+    var wg = new THREE.Group();
+    var sh = new THREE.Shape();
+    sh.moveTo(0,2*SC); sh.lineTo(side*5*SC,4*SC); sh.lineTo(side*18*SC,1.5*SC);
+    sh.lineTo(side*20*SC,-3*SC); sh.lineTo(side*15*SC,-9*SC);
+    sh.lineTo(side*8*SC,-11*SC); sh.lineTo(side*2*SC,-5*SC);
+    sh.lineTo(0,-2*SC); sh.lineTo(0,2*SC);
+    var wm2 = new THREE.Mesh(new THREE.ShapeGeometry(sh), wM);
+    wm2.rotation.x = -Math.PI/2; wg.add(wm2);
+    wg.position.set(0, 1.5*SC, 0); return wg;
+  }
+  var rwg = mkWing(1), lwg = mkWing(-1);
+  g.add(rwg); g.add(lwg); g.rWing = rwg; g.lWing = lwg;
+
+  // Stubby tail
+  for (var i = 1; i <= 6; i++) {
+    var ts = new THREE.Mesh(new THREE.SphereGeometry(Math.max(2.8-i*0.32,0.5)*SC, 6, 5), pM);
+    ts.position.set(0, -i*0.55*SC, -8*SC - i*2.2*SC); g.add(ts);
+  }
+
+  // Legs
+  function mkLeg(sx, pz) {
+    var lg = new THREE.Group();
+    var t2 = new THREE.Mesh(new THREE.CylinderGeometry(0.9*SC,0.7*SC,4.5*SC,5), pM);
+    t2.rotation.z = sx*0.55; t2.position.set(sx*2*SC,-1*SC,0); lg.add(t2);
+    var sh2 = new THREE.Mesh(new THREE.CylinderGeometry(0.65*SC,0.45*SC,4*SC,5), pM);
+    sh2.position.set(sx*4.5*SC,-4.5*SC,0); sh2.rotation.z = -sx*0.85; lg.add(sh2);
+    lg.position.set(0,-1.8*SC,pz); return lg;
+  }
+  g.add(mkLeg(1,5*SC)); g.add(mkLeg(-1,5*SC));
+  g.add(mkLeg(1,-4*SC)); g.add(mkLeg(-1,-4*SC));
+
+  scene.add(g);
+  return g;
+}
+
+function hatchBaby(collectPos, rarityIdx) {
+  // Shell crack particle burst
+  for (var i = 0; i < 14; i++) {
+    var shard = new THREE.Mesh(
+      new THREE.TetrahedronGeometry(0.4 + Math.random()*0.5, 0),
+      new THREE.MeshLambertMaterial({ color: new THREE.Color().setHSL(0.08+rarityIdx*0.08, 0.6, 0.55) })
+    );
+    shard.position.copy(collectPos);
+    var vel = new THREE.Vector3(
+      (Math.random()-0.5)*3.5, Math.random()*3+1, (Math.random()-0.5)*3.5
+    );
+    scene.add(shard);
+    particles.push({ mesh: shard, vel: vel, life: 45 + Math.random()*20, sw: false, bl: 0 });
+  }
+
+  var mesh = buildBabyDragon(rarityIdx);
+  mesh.position.copy(collectPos);
+  mesh.position.y += 2;
+
+  var cols = EGG_RARITY_COLS[rarityIdx] || EGG_RARITY_COLS[0];
+  // Orbit offset: each baby fans out around the player
+  var idx = babyDragons.length;
+  var orbitAngle = (idx / 8) * Math.PI * 2;  // spread evenly, up to 8
+  var orbitR = 14 + idx * 4;
+
+  babyDragons.push({
+    mesh: mesh,
+    rarity: rarityIdx,
+    orbitAngle: orbitAngle,
+    orbitR: orbitR,
+    orbitSpeed: 0.6 + Math.random() * 0.3,
+    phaseOffset: Math.random() * Math.PI * 2,
+    wingT: 0,
+    fireCooldown: Math.floor(Math.random() * 20)  // stagger initial fire
+  });
+  sfxHatch();
+}
+
+// ════════════════════════════════════════════════════════
 //  PLAYER DRAGON
 // ════════════════════════════════════════════════════════
 const pd = buildDragon(0x1A5F7A, 0x0D3349);
-pd.position.set(0, 90, 0);
+// Start inside the spawn safe zone, landed on the ground
+var SPAWN_X = 0, SPAWN_Z = 0;
+var SPAWN_Y = terrainH(SPAWN_X, SPAWN_Z) + 5;
+pd.position.set(SPAWN_X, SPAWN_Y, 0);
 scene.add(pd);
 const rider = buildRider();
 rider.position.set(0, 5.5, -2);
@@ -826,6 +1071,377 @@ for (let i = 0; i < 14; i++) {
 }
 
 // ════════════════════════════════════════════════════════
+//  CAVES
+// ════════════════════════════════════════════════════════
+const caves = [];
+
+function buildCave(x, z) {
+  const wy = terrainH(x, z);
+  const g = new THREE.Group();
+
+  const rockMat = new THREE.MeshLambertMaterial({ color: 0x4a4040 });
+  const darkMat = new THREE.MeshLambertMaterial({ color: 0x1a1010 });
+  const mossMatC = new THREE.MeshLambertMaterial({ color: 0x2a3820 });
+
+  // Main cave arch — hollow cone shaped opening
+  // Outer rock mass
+  const outer = new THREE.Mesh(new THREE.SphereGeometry(14, 10, 8), rockMat);
+  outer.scale.set(1, 0.55, 0.7); outer.castShadow = true; g.add(outer);
+
+  // Dark tunnel mouth
+  const mouth = new THREE.Mesh(new THREE.CylinderGeometry(6, 7, 12, 10), darkMat);
+  mouth.rotation.x = Math.PI / 2; mouth.position.set(0, 1, 2); g.add(mouth);
+
+  // Arch stones around entrance
+  for (let i = 0; i < 8; i++) {
+    const a = (i / 8) * Math.PI; // semicircle top
+    const stone = new THREE.Mesh(new THREE.BoxGeometry(2.5, 2.5, 2.2),
+      new THREE.MeshLambertMaterial({ color: new THREE.Color().setHSL(0.03, 0.2, 0.28 + Math.random() * 0.1) }));
+    stone.position.set(Math.cos(a) * 7, Math.sin(a) * 6 + 1, 3);
+    stone.rotation.z = a; stone.castShadow = true; g.add(stone);
+  }
+
+  // Stalactites hanging from top
+  for (let s = 0; s < 5; s++) {
+    const h2 = 2 + Math.random() * 4;
+    const stal = new THREE.Mesh(new THREE.ConeGeometry(0.4 - s * 0.06, h2, 5),
+      new THREE.MeshLambertMaterial({ color: 0x554040 }));
+    stal.position.set((s - 2) * 2.2, 5, 1.5);
+    stal.rotation.x = Math.PI; g.add(stal);
+  }
+
+  // Rock rubble at base
+  for (let r = 0; r < 7; r++) {
+    const rk = new THREE.Mesh(
+      new THREE.DodecahedronGeometry(0.6 + Math.random() * 1.2, 0),
+      new THREE.MeshLambertMaterial({ color: new THREE.Color().setHSL(0.03, 0.15, 0.3 + Math.random() * 0.15) })
+    );
+    rk.position.set((Math.random() - 0.5) * 18, -1, (Math.random() - 0.5) * 8 + 3);
+    rk.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
+    rk.castShadow = true; g.add(rk);
+  }
+
+  // Moss patches on rocks
+  for (let m = 0; m < 4; m++) {
+    const moss = new THREE.Mesh(new THREE.SphereGeometry(1.5 + Math.random(), 5, 4), mossMatC);
+    moss.scale.y = 0.25; moss.position.set((Math.random()-0.5)*12, -0.8, (Math.random()-0.5)*8+2); g.add(moss);
+  }
+
+  // Glowing crystal inside (beckons player)
+  const crystalLight = new THREE.PointLight(0x4488ff, 1.8, 28);
+  crystalLight.position.set(0, 2, -4); g.add(crystalLight);
+  const crystal = new THREE.Mesh(new THREE.OctahedronGeometry(1.4),
+    new THREE.MeshBasicMaterial({ color: 0x6699ff, transparent: true, opacity: 0.85 }));
+  crystal.position.set(0, 1.5, -3); g.add(crystal);
+
+  // Face it outward (away from hill center if possible, default -Z)
+  const angle = Math.atan2(x, z);
+  g.rotation.y = angle;
+  g.position.set(x, wy - 2, z);
+  scene.add(g);
+
+  caves.push({
+    mesh: g, pos: new THREE.Vector3(x, wy + 2, z),
+    crystal: crystal, light: crystalLight,
+    enterRadius: 22, innerRadius: 14
+  });
+  return g;
+}
+
+// Place caves in high-terrain hillside areas
+const CAVE_SPOTS = [
+  [-280, -180], [320, 120], [-180, 300], [400, -240],
+  [120, -450], [-430, 220], [250, 410], [-350, -380]
+];
+CAVE_SPOTS.forEach(function(sp) {
+  const h = terrainH(sp[0], sp[1]);
+  if (h > 30) buildCave(sp[0], sp[1]);
+  else {
+    // Nudge to higher ground
+    buildCave(sp[0] + 30, sp[1] + 30);
+  }
+});
+
+// ════════════════════════════════════════════════════════
+//  TREASURE CHESTS
+// ════════════════════════════════════════════════════════
+const treasures = [];
+
+function buildChest(x, y, z, value) {
+  const g = new THREE.Group();
+  const woodMat = new THREE.MeshLambertMaterial({ color: 0x7B4F1A });
+  const goldMat = new THREE.MeshLambertMaterial({ color: 0xFFCC00 });
+  const darkMat2 = new THREE.MeshLambertMaterial({ color: 0x3A2808 });
+
+  // Chest body
+  const body = new THREE.Mesh(new THREE.BoxGeometry(4, 2.8, 3), woodMat);
+  body.position.y = 1.4; body.castShadow = true; g.add(body);
+
+  // Lid (slightly open)
+  const lid = new THREE.Mesh(new THREE.BoxGeometry(4, 1.4, 3), darkMat2);
+  lid.position.set(0, 3.2, -0.8); lid.rotation.x = -0.4; lid.castShadow = true; g.add(lid);
+
+  // Gold trim straps
+  for (let s = -1; s <= 1; s += 2) {
+    const strap = new THREE.Mesh(new THREE.BoxGeometry(0.28, 3.5, 3.2), goldMat);
+    strap.position.set(s * 1.5, 1.8, 0); g.add(strap);
+  }
+  const lock = new THREE.Mesh(new THREE.BoxGeometry(1, 0.9, 0.4), goldMat);
+  lock.position.set(0, 1.6, 1.6); g.add(lock);
+  const keyhole = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 0.5, 8), darkMat2);
+  keyhole.rotation.x = Math.PI / 2; keyhole.position.set(0, 1.6, 1.85); g.add(keyhole);
+
+  // Gold coins spilling out
+  for (let c = 0; c < 6; c++) {
+    const coin = new THREE.Mesh(new THREE.CylinderGeometry(0.38, 0.38, 0.18, 8),
+      new THREE.MeshLambertMaterial({ color: 0xFFD700 }));
+    coin.position.set((Math.random()-0.5)*3.5, 1 + Math.random()*0.5, 1 + Math.random());
+    coin.rotation.set(Math.random()*0.5, Math.random()*Math.PI, Math.random()*0.5);
+    g.add(coin);
+  }
+
+  // Glow aura
+  const glowLight = new THREE.PointLight(0xFFCC00, 1.4, 20);
+  glowLight.position.set(0, 4, 0); g.add(glowLight);
+  const aura = new THREE.Mesh(new THREE.SphereGeometry(3.5, 8, 6),
+    new THREE.MeshBasicMaterial({ color: 0xFFCC00, transparent: true, opacity: 0.15 }));
+  aura.position.y = 2; g.add(aura);
+
+  g.position.set(x, y, z);
+  g.rotation.y = Math.random() * Math.PI * 2;
+  scene.add(g);
+
+  treasures.push({
+    mesh: g, pos: new THREE.Vector3(x, y, z),
+    value: value || 300, active: true,
+    aura: aura, light: glowLight,
+    bobY: y
+  });
+}
+
+// Place chests: some in open world, some near caves, some require landing
+const CHEST_SPOTS = [
+  // Open world
+  [150, 80, 200], [-200, 90, -150], [300, 75, 330], [-380, 100, 50],
+  [80, 70, -330], [440, 85, 160], [-120, 95, 430], [220, 110, -400],
+  // Near villages (on ground, require landing)
+  [240, -1, 360], [-180, -1, 430], [80, -1, -370], [500, -1, -90],
+  // Inside / near caves (high value)
+  [-250, -1, -170], [330, -1, 130], [-160, -1, 310], [410, -1, -230],
+  // Deep cave treasures (highest value)
+  [120, -1, -440], [-420, -1, 230]
+];
+
+CHEST_SPOTS.forEach(function(sp, i) {
+  var y = sp[1] < 0 ? terrainH(sp[0], sp[2]) + 1.5 : sp[1];
+  var val = i >= 16 ? 750 : i >= 12 ? 500 : i >= 8 ? 300 : 200;
+  buildChest(sp[0], y, sp[2], val);
+});
+
+// ════════════════════════════════════════════════════════
+//  SAFE ZONES
+// ════════════════════════════════════════════════════════
+const safeZones = [];
+
+function buildSafeZone(x, z, radius) {
+  radius = radius || 38;
+  const g = new THREE.Group();
+  const wy = terrainH(x, z);
+
+  // Ground glow circle (rings)
+  for (var ri = 0; ri < 3; ri++) {
+    var r2 = radius - ri * 9;
+    var ring = new THREE.Mesh(
+      new THREE.TorusGeometry(r2, 0.45 - ri * 0.1, 6, 48),
+      new THREE.MeshBasicMaterial({ color: 0x44FFCC, transparent: true, opacity: 0.22 - ri * 0.05 })
+    );
+    ring.rotation.x = -Math.PI / 2; ring.position.y = 0.3; g.add(ring);
+  }
+
+  // Ground disc fill
+  var disc = new THREE.Mesh(
+    new THREE.CircleGeometry(radius, 36),
+    new THREE.MeshBasicMaterial({ color: 0x00FFAA, transparent: true, opacity: 0.06, side: THREE.DoubleSide })
+  );
+  disc.rotation.x = -Math.PI / 2; disc.position.y = 0.2; g.add(disc);
+
+  // Central shrine totem
+  var pillar = new THREE.Mesh(new THREE.CylinderGeometry(0.9, 1.2, 12, 8),
+    new THREE.MeshLambertMaterial({ color: 0xCCBB88 }));
+  pillar.position.y = 6; pillar.castShadow = true; g.add(pillar);
+
+  var cap = new THREE.Mesh(new THREE.SphereGeometry(2.2, 8, 6),
+    new THREE.MeshBasicMaterial({ color: 0x44FFCC, transparent: true, opacity: 0.85 }));
+  cap.position.y = 13; g.add(cap);
+
+  // Runes carved on pillar (decorative boxes)
+  for (var rn = 0; rn < 4; rn++) {
+    var rune = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.8, 0.8),
+      new THREE.MeshBasicMaterial({ color: 0x88FFCC }));
+    var a = (rn / 4) * Math.PI * 2;
+    rune.position.set(Math.cos(a) * 1, 4 + rn * 1.8, Math.sin(a) * 1);
+    g.add(rune);
+  }
+
+  // Standing stones around perimeter
+  var stoneCount = 6;
+  for (var s = 0; s < stoneCount; s++) {
+    var sa = (s / stoneCount) * Math.PI * 2;
+    var st = new THREE.Mesh(
+      new THREE.BoxGeometry(1.5 + Math.random(), 5 + Math.random() * 4, 1.2),
+      new THREE.MeshLambertMaterial({ color: new THREE.Color().setHSL(0.03, 0.1, 0.45) })
+    );
+    st.position.set(Math.cos(sa) * (radius - 4), (5 + Math.random() * 4) / 2, Math.sin(sa) * (radius - 4));
+    st.rotation.y = sa + Math.random() * 0.4; st.castShadow = true; g.add(st);
+    // Connecting lintel on alternating stones
+    if (s % 2 === 0) {
+      var lintel = new THREE.Mesh(new THREE.BoxGeometry(12, 1.2, 1.2),
+        new THREE.MeshLambertMaterial({ color: 0x888070 }));
+      var sa2 = ((s + 0.5) / stoneCount) * Math.PI * 2;
+      lintel.position.set(Math.cos(sa2) * (radius - 4), 7 + Math.random() * 2, Math.sin(sa2) * (radius - 4));
+      lintel.rotation.y = sa2; lintel.castShadow = true; g.add(lintel);
+    }
+  }
+
+  // Beam of light (thin tall cylinder)
+  var beam = new THREE.Mesh(
+    new THREE.CylinderGeometry(2.5, 0.5, 120, 10),
+    new THREE.MeshBasicMaterial({ color: 0x44FFCC, transparent: true, opacity: 0.07, side: THREE.DoubleSide })
+  );
+  beam.position.y = 60; g.add(beam);
+
+  // Ambient light inside zone
+  var light = new THREE.PointLight(0x44FFCC, 1.2, radius * 2.5);
+  light.position.y = 8; g.add(light);
+
+  g.position.set(x, wy, z);
+  scene.add(g);
+
+  safeZones.push({
+    mesh: g, pos: new THREE.Vector3(x, wy, z),
+    radius: radius, cap: cap, beam: beam, light: light
+  });
+}
+
+// Place safe zones near key landmarks
+buildSafeZone(280, 380, 40);   // near village 1
+buildSafeZone(-190, 440, 38);  // near village 2
+buildSafeZone(-310, -210, 42); // near castle 1
+buildSafeZone(490, 390, 38);   // near castle 2
+buildSafeZone(0, 0, 36);       // spawn area safety
+
+// ════════════════════════════════════════════════════════
+//  DRAGON EGGS
+// ════════════════════════════════════════════════════════
+const dragonEggs = [];
+
+const EGG_COLS = [
+  { shell: 0x3A7A2A, spot: 0x1A4A10, glow: 0x88FF44 }, // green
+  { shell: 0x7A2A88, spot: 0x44106A, glow: 0xCC66FF }, // purple
+  { shell: 0xCC6600, spot: 0x883300, glow: 0xFFAA22 }, // orange
+  { shell: 0x1A4488, spot: 0x0A2255, glow: 0x44AAFF }, // blue
+  { shell: 0x882222, spot: 0x550A0A, glow: 0xFF4444 }, // red (rare)
+];
+
+function buildEgg(x, z, rarity) {
+  var wy = terrainH(x, z);
+  var cols = EGG_COLS[rarity !== undefined ? rarity : Math.floor(Math.random() * EGG_COLS.length)];
+  var g = new THREE.Group();
+
+  // Egg body — scaled sphere
+  var shellMat = new THREE.MeshLambertMaterial({ color: cols.shell });
+  var eggMesh = new THREE.Mesh(new THREE.SphereGeometry(2.2, 12, 10), shellMat);
+  eggMesh.scale.y = 1.32; eggMesh.castShadow = true; g.add(eggMesh);
+
+  // Spots / speckles on shell
+  var spotMat = new THREE.MeshLambertMaterial({ color: cols.spot });
+  var spotPositions = [
+    [0, 2.2, 1.6], [1.4, 1.2, -1.0], [-1.5, 0.4, 1.0],
+    [0.8, -0.8, 1.8], [-0.6, 2.0, -1.4], [1.8, 0.2, 0.4],
+    [-1.0, -1.4, -1.2], [0.2, 1.6, 1.8],
+  ];
+  spotPositions.forEach(function(sp) {
+    var dot = new THREE.Mesh(new THREE.SphereGeometry(0.35 + Math.random() * 0.2, 6, 5), spotMat);
+    dot.position.set(sp[0], sp[1] * 1.32, sp[2]); g.add(dot);
+  });
+
+  // Nest — ring of sticks/hay
+  var nestMat = new THREE.MeshLambertMaterial({ color: 0x8B6914 });
+  var nest = new THREE.Mesh(new THREE.TorusGeometry(3.2, 0.9, 6, 16), nestMat);
+  nest.rotation.x = -Math.PI / 2; nest.position.y = -1.4; g.add(nest);
+  // Nest floor
+  var nestFloor = new THREE.Mesh(new THREE.CircleGeometry(2.6, 12),
+    new THREE.MeshLambertMaterial({ color: 0x7A5C10, side: THREE.DoubleSide }));
+  nestFloor.rotation.x = -Math.PI / 2; nestFloor.position.y = -1.8; g.add(nestFloor);
+  // Twigs around nest
+  for (var tw = 0; tw < 8; tw++) {
+    var twig = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.12, 2.2 + Math.random(), 4),
+      new THREE.MeshLambertMaterial({ color: 0x6B4D0A }));
+    var ta = (tw / 8) * Math.PI * 2;
+    twig.position.set(Math.cos(ta) * 3, -1.2, Math.sin(ta) * 3);
+    twig.rotation.z = (Math.random() - 0.5) * 1.0;
+    twig.rotation.y = ta; g.add(twig);
+  }
+
+  // Inner glow — pulsing point light
+  var glowLight = new THREE.PointLight(cols.glow, 1.6, 18);
+  glowLight.position.y = 1; g.add(glowLight);
+
+  // Outer aura sphere
+  var auraMat = new THREE.MeshBasicMaterial({ color: cols.glow, transparent: true, opacity: 0.18 });
+  var aura = new THREE.Mesh(new THREE.SphereGeometry(3.8, 8, 6), auraMat);
+  aura.scale.y = 1.2; g.add(aura);
+
+  // Particle wisps orbiting the egg
+  var wisps = [];
+  for (var w = 0; w < 4; w++) {
+    var wisp = new THREE.Mesh(new THREE.SphereGeometry(0.28, 5, 4),
+      new THREE.MeshBasicMaterial({ color: cols.glow, transparent: true, opacity: 0.75 }));
+    g.add(wisp); wisps.push(wisp);
+  }
+
+  g.position.set(x, wy, z);
+  scene.add(g);
+
+  var val = rarity === 4 ? 600 : rarity === 3 ? 400 : 250;
+  dragonEggs.push({
+    mesh: g, pos: new THREE.Vector3(x, wy + 1.5, z),
+    active: true, glow: glowLight, aura: aura, wisps: wisps,
+    rarity: rarity !== undefined ? rarity : Math.floor(Math.random() * EGG_COLS.length),
+    glowCol: cols.glow, value: val, baseY: wy
+  });
+}
+
+// Scatter eggs: near safe zones, villages, caves, and open hillsides
+var EGG_SPOTS = [
+  // Near spawn safe zone
+  [18, -1, 12], [-15, -1, 20], [8, -1, -18], [-22, -1, -8], [25, -1, -5],
+  // Near village 1
+  [230, -1, 350], [270, -1, 395], [245, -1, 420],
+  // Near village 2
+  [-170, -1, 415], [-205, -1, 450], [-195, -1, 390],
+  // Near castle 1
+  [-295, -1, -230], [-335, -1, -195], [-320, -1, -250],
+  // Near castle 2
+  [465, -1, 365], [500, -1, 400],
+  // Near caves / hillsides
+  [-260, -1, -165], [310, -1, 115], [115, -1, -435],
+  // Open world flying collectibles (elevated)
+  [180, 55, 260], [-240, 70, 130], [380, 60, -100],
+  [-100, 80, -350], [310, 65, 280], [-380, 75, -120],
+  // Rare red eggs (rarity=4, high up)
+  [0, 120, 300], [-300, 110, 0], [200, 100, -200],
+];
+
+EGG_SPOTS.forEach(function(sp, idx) {
+  var isFlying = sp[1] > 10;
+  var rar;
+  if (idx >= EGG_SPOTS.length - 3) rar = 4; // last 3 are rare red
+  else rar = Math.floor(Math.random() * 4); // common colours
+  buildEgg(sp[0], sp[2], rar);
+});
+
+// ════════════════════════════════════════════════════════
 //  ENEMIES
 // ════════════════════════════════════════════════════════
 const enemies = [];
@@ -880,6 +1496,39 @@ function fireBlast(dir) {
   g.position.copy(pos); scene.add(g);
   blasts.push({ mesh: g, vel: d.clone().multiplyScalar(5.5), life: 90, maxLife: 90 });
   sfxFire();
+  // Each hatched baby fires alongside the player
+  babyDragons.forEach(function(baby) {
+    if (baby.fireCooldown <= 0) {
+      babyFire(baby, d);
+      baby.fireCooldown = 8; // short stagger between babies
+    }
+  });
+}
+
+function babyFire(baby, dirOverride) {
+  // Direction: same as player but fanned slightly based on baby orbit angle
+  var baseDir = dirOverride || new THREE.Vector3(0, 0, 1).applyQuaternion(pd.quaternion);
+  // Fan the shot slightly sideways from the main blast
+  var fan = new THREE.Vector3(
+    Math.sin(baby.orbitAngle) * 0.28,
+    (Math.random() - 0.5) * 0.08,
+    0
+  ).applyQuaternion(pd.quaternion);
+  var d = baseDir.clone().add(fan).normalize();
+  var pos = baby.mesh.position.clone().add(d.clone().multiplyScalar(6)).add(new THREE.Vector3(0, 1, 0));
+
+  var cols = EGG_RARITY_COLS[baby.rarity] || EGG_RARITY_COLS[0];
+  var g = new THREE.Group();
+  g.add(new THREE.Mesh(new THREE.SphereGeometry(1.0, 7, 5),
+    new THREE.MeshBasicMaterial({ color: cols.pri })));
+  g.add(new THREE.Mesh(new THREE.SphereGeometry(0.65, 6, 4),
+    new THREE.MeshBasicMaterial({ color: 0xFFFFAA })));
+  g.add(new THREE.Mesh(new THREE.SphereGeometry(1.8, 7, 5),
+    new THREE.MeshBasicMaterial({ color: cols.sec, transparent: true, opacity: 0.35 })));
+  g.position.copy(pos);
+  scene.add(g);
+  blasts.push({ mesh: g, vel: d.clone().multiplyScalar(5.2), life: 90, maxLife: 90 });
+  sfxBabyFire();
 }
 
 function enemyFire(e) {
@@ -934,6 +1583,37 @@ function drawMinimap() {
   bg.addColorStop(0, 'rgba(20,40,20,.95)'); bg.addColorStop(1, 'rgba(5,15,5,.95)');
   mmCtx.fillStyle = bg; mmCtx.beginPath(); mmCtx.arc(MM/2, MM/2, MM/2, 0, Math.PI*2); mmCtx.fill();
   const tp = function(x, z) { return [MM/2 + x/MMR*(MM/2), MM/2 + z/MMR*(MM/2)]; };
+  // Dragon eggs
+  dragonEggs.forEach(function(eg) {
+    if (!eg.active) return;
+    var p2 = tp(eg.pos.x, eg.pos.z);
+    mmCtx.fillStyle = 'rgba(140,220,255,.85)';
+    mmCtx.beginPath(); mmCtx.arc(p2[0], p2[1], 2, 0, Math.PI*2); mmCtx.fill();
+  });
+  // Safe zones
+  safeZones.forEach(function(sz) {
+    var p2 = tp(sz.pos.x, sz.pos.z);
+    mmCtx.strokeStyle = 'rgba(68,255,200,.55)'; mmCtx.lineWidth = 2;
+    mmCtx.beginPath(); mmCtx.arc(p2[0], p2[1], sz.radius / MMR * (MM/2), 0, Math.PI*2); mmCtx.stroke();
+    mmCtx.fillStyle = 'rgba(68,255,200,.25)';
+    mmCtx.beginPath(); mmCtx.arc(p2[0], p2[1], 4, 0, Math.PI*2); mmCtx.fill();
+  });
+  // Caves
+  caves.forEach(function(cv) {
+    var p2 = tp(cv.pos.x, cv.pos.z);
+    mmCtx.fillStyle = 'rgba(100,100,180,.8)';
+    // Draw triangle = cave symbol
+    mmCtx.beginPath();
+    mmCtx.moveTo(p2[0], p2[1]-5); mmCtx.lineTo(p2[0]+4, p2[1]+3); mmCtx.lineTo(p2[0]-4, p2[1]+3);
+    mmCtx.closePath(); mmCtx.fill();
+  });
+  // Treasures
+  treasures.forEach(function(tr) {
+    if (!tr.active) return;
+    var p2 = tp(tr.pos.x, tr.pos.z);
+    mmCtx.fillStyle = 'rgba(255,220,0,.9)';
+    mmCtx.beginPath(); mmCtx.arc(p2[0], p2[1], 2.5, 0, Math.PI*2); mmCtx.fill();
+  });
   // Hoops
   hoops.forEach(function(h) {
     if (!h.active) return;
@@ -1115,7 +1795,7 @@ renderer.domElement.addEventListener('touchmove',  function(e) { e.preventDefaul
 //  GAME STATE
 // ════════════════════════════════════════════════════════
 let score = 0, health = 100, kills = 0;
-let landed = false, cooldown = 0, wingT = 0, gameOn = false, fireCharge = 100;
+let landed = true, cooldown = 0, wingT = 0, gameOn = false, fireCharge = 100;
 let dayTime = 0;
 const velocity = new THREE.Vector3();
 let popTO = null, waveBTO = null;
@@ -1165,12 +1845,21 @@ function checkWave() {
   }
 }
 
+function dismissIntro() {
+  var ov = document.getElementById('intro-overlay');
+  if (ov && !ov.classList.contains('hidden')) {
+    ov.classList.add('hidden');
+    setTimeout(function() { ov.style.display = 'none'; }, 2000);
+  }
+}
 function startGame() {
   document.getElementById('start').style.display = 'none';
   gameOn = true;
   getAC(); // Unlock audio on user gesture
   // Try pointer lock for desktop
   try { renderer.domElement.requestPointerLock(); } catch(e) {}
+  // Auto-dismiss intro after 4.5 seconds
+  setTimeout(dismissIntro, 4500);
 }
 function restartGame() {
   document.getElementById('dead').style.display = 'none';
@@ -1184,6 +1873,17 @@ function restartGame() {
   });
   enemies.length = 0;
   for (let i = 0; i < 6; i++) spawnEnemy();
+  // Reset treasures
+  treasures.forEach(function(tr) { tr.active = true; tr.mesh.visible = true; });
+  // Reset eggs
+  dragonEggs.forEach(function(eg) { eg.active = true; eg.mesh.visible = true; });
+  // Remove all hatched babies
+  babyDragons.forEach(function(b) { if (b.mesh) scene.remove(b.mesh); });
+  babyDragons.length = 0;
+  document.getElementById('egg-hud').style.filter = '';
+  // Re-land at spawn
+  pd.position.set(SPAWN_X, SPAWN_Y, 0); landed = true;
+  document.getElementById('quest').style.filter = '';
   document.getElementById('wv').textContent = '1';
   gameOn = true;
   try { renderer.domElement.requestPointerLock(); } catch(e) {}
@@ -1193,6 +1893,10 @@ window.restartGame = restartGame;
 
 document.getElementById('start').addEventListener('touchstart', function(e) { e.preventDefault(); startGame(); }, { passive: false });
 document.getElementById('start').addEventListener('click', startGame);
+// Dismiss intro on first movement
+document.addEventListener('keydown', function(e) {
+  if(['KeyW','KeyS','KeyA','KeyD','Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].indexOf(e.code)>=0) dismissIntro();
+}, { once: false });
 
 // ════════════════════════════════════════════════════════
 //  MAIN LOOP
@@ -1477,6 +2181,164 @@ function animate() {
     }
   });
 
+  // ── DRAGON EGGS ──────────────────────────────────────
+  dragonEggs.forEach(function(eg) {
+    if (!eg.active) return;
+    var pulse = Math.sin(t * 2.2 + eg.pos.x) * 0.5 + 0.5;
+    eg.glow.intensity = 1.0 + pulse * 1.2;
+    eg.aura.material.opacity = 0.10 + pulse * 0.12;
+    eg.mesh.rotation.y += dt * 0.4;
+    // Wisp orbit
+    eg.wisps.forEach(function(w, wi) {
+      var wa = t * 1.8 + wi * Math.PI / 2;
+      var wr = 3.5 + Math.sin(t + wi) * 0.5;
+      w.position.set(Math.cos(wa) * wr, 1.5 + Math.sin(t * 1.1 + wi) * 1.2, Math.sin(wa) * wr);
+      w.material.opacity = 0.55 + pulse * 0.3;
+    });
+    // Collect — fly-through or land nearby
+    var collectR = landed ? 7 : 12;
+    if (pd.position.distanceTo(eg.mesh.position) < collectR) {
+      eg.active = false; eg.mesh.visible = false;
+      score += eg.value;
+      sfxEggCollect();
+      var eggNames = ['Green','Purple','Orange','Blue','Rare Red'];
+      showPopup('🥚 ' + eggNames[eg.rarity] + ' Egg! +' + eg.value);
+      // Teal-blue flash
+      var pfEl = document.getElementById('puf');
+      pfEl.style.background = 'rgba(80,200,255,.32)';
+      pfEl.style.transition = 'none';
+      setTimeout(function() { pfEl.style.background = 'rgba(80,200,255,0)'; pfEl.style.transition = 'background 1s'; }, 100);
+      // Hatch after 5 seconds
+      (function(rar, cPos) {
+        setTimeout(function() {
+          if (!gameOn) return;
+          hatchBaby(cPos.clone(), rar);
+          showPopup('🐣 A baby dragon hatched!');
+        }, 5000);
+      })(eg.rarity, eg.mesh.position.clone());
+    }
+  });
+
+  // ── BABY DRAGONS ─────────────────────────────────────
+  babyDragons.forEach(function(baby, bi) {
+    baby.wingT += dt * 4.5;
+    baby.fireCooldown = Math.max(0, baby.fireCooldown - 1);
+
+    // Orbit around the player in a loose formation
+    // Each baby has a unique angle that slowly drifts
+    baby.orbitAngle += dt * baby.orbitSpeed * 0.25;
+
+    var orb = baby.orbitAngle;
+    var targetX = pd.position.x + Math.cos(orb) * baby.orbitR;
+    var targetZ = pd.position.z + Math.sin(orb) * baby.orbitR;
+    var targetY = pd.position.y + 3 + Math.sin(t * 1.4 + baby.phaseOffset) * 3;
+
+    // Smooth follow
+    baby.mesh.position.x += (targetX - baby.mesh.position.x) * 0.06;
+    baby.mesh.position.y += (targetY - baby.mesh.position.y) * 0.06;
+    baby.mesh.position.z += (targetZ - baby.mesh.position.z) * 0.06;
+
+    // Face the player dragon
+    var toPlayer = pd.position.clone().sub(baby.mesh.position);
+    baby.mesh.rotation.y = Math.atan2(toPlayer.x, toPlayer.z);
+    // Slight up/down tilt toward player altitude
+    baby.mesh.rotation.x = -Math.atan2(toPlayer.y, Math.sqrt(toPlayer.x*toPlayer.x+toPlayer.z*toPlayer.z)) * 0.35;
+
+    // Wing flap
+    var fv = Math.sin(baby.wingT) * 0.55;
+    if (baby.mesh.rWing) { baby.mesh.rWing.rotation.z = fv; baby.mesh.lWing.rotation.z = -fv; }
+
+    // Head bob
+    if (baby.mesh.headGroup) baby.mesh.headGroup.rotation.x = Math.sin(baby.wingT * 0.5) * 0.08;
+  });
+
+  // ── CAVES ────────────────────────────────────────────
+  var inCave = false;
+  caves.forEach(function(cv) {
+    // Pulse crystal
+    cv.crystal.rotation.y += dt * 1.2;
+    cv.crystal.rotation.x += dt * 0.7;
+    cv.light.intensity = 1.4 + Math.sin(t * 2.5 + cv.pos.x) * 0.5;
+    var dCave = pd.position.distanceTo(cv.pos);
+    if (dCave < cv.enterRadius) inCave = true;
+  });
+  // Cave atmosphere
+  var caveOverlay = document.getElementById('cave-overlay');
+  if (inCave) {
+    caveOverlay.style.background = 'rgba(0,0,0,0.38)';
+    if (!window._lastInCave) { sfxCaveEnter(); window._lastInCave = true; }
+  } else {
+    caveOverlay.style.background = 'rgba(0,0,0,0)';
+    window._lastInCave = false;
+  }
+
+  // ── TREASURE CHESTS ──────────────────────────────────
+  var treFound = 0;
+  treasures.forEach(function(tr) {
+    if (!tr.active) { treFound++; return; }
+    // Bob and glow pulse
+    tr.mesh.position.y = tr.bobY + Math.sin(t * 1.8 + tr.pos.x) * 0.4;
+    tr.mesh.rotation.y += dt * 0.6;
+    tr.aura.material.opacity = 0.10 + Math.sin(t * 2.2 + tr.pos.z) * 0.06;
+    tr.light.intensity = 1.0 + Math.sin(t * 2.5 + tr.pos.x) * 0.5;
+    // Collection — flying or landed within range
+    var collectR = landed ? 8 : 14;
+    if (pd.position.distanceTo(tr.mesh.position) < collectR) {
+      tr.active = false; tr.mesh.visible = false;
+      score += tr.value;
+      sfxTreasure();
+      showPopup('💰 +' + tr.value + ' TREASURE!');
+      // Flash gold screen
+      var pfEl = document.getElementById('puf');
+      pfEl.style.background = 'rgba(255,210,0,.35)';
+      pfEl.style.transition = 'none';
+      setTimeout(function() { pfEl.style.background = 'rgba(255,210,0,0)'; pfEl.style.transition = 'background 1s'; }, 100);
+    }
+  });
+
+  // ── SAFE ZONES ───────────────────────────────────────
+  var inSafe = false;
+  safeZones.forEach(function(sz) {
+    sz.cap.rotation.y += dt * 0.8;
+    sz.beam.rotation.y += dt * 0.15;
+    sz.light.intensity = 0.9 + Math.sin(t * 1.5 + sz.pos.x) * 0.35;
+    var dSafe = pd.position.distanceTo(sz.pos);
+    if (dSafe < sz.radius) {
+      inSafe = true;
+      // Heal player slowly
+      health = Math.min(100, health + dt * 4);
+      // Ring pulse
+      sz.mesh.children.forEach(function(c) {
+        if (c.geometry && c.geometry.type === 'TorusGeometry') {
+          c.material.opacity = 0.18 + Math.sin(t * 2 + sz.pos.x) * 0.10;
+        }
+      });
+    }
+  });
+
+  // Safe zone enemies — stop chasing & firing when player inside safe zone
+  if (inSafe) {
+    enemies.forEach(function(e) {
+      if (!e.alive) return;
+      // Push enemies back out from safe zone
+      var nearest = null, nearD = Infinity;
+      safeZones.forEach(function(sz) {
+        var d = e.mesh.position.distanceTo(sz.pos);
+        if (d < nearD) { nearD = d; nearest = sz; }
+      });
+      if (nearest && nearD < nearest.radius + 30) {
+        var pushDir = e.mesh.position.clone().sub(nearest.pos).normalize();
+        e.mesh.position.addScaledVector(pushDir, 1.5);
+        e.fireCooldown = Math.max(e.fireCooldown, 90); // suppress fire
+      }
+    });
+    if (!window._lastInSafe) { sfxSafeZone(); window._lastInSafe = true; }
+  } else {
+    window._lastInSafe = false;
+  }
+  var sfEl = document.getElementById('safezone');
+  sfEl.style.opacity = inSafe ? '1' : '0';
+
   // ── WINDMILLS ────────────────────────────────────────
   windmills.forEach(function(wm) { if (wm._hub) wm._hub.rotation.z += dt * 0.8; });
 
@@ -1509,9 +2371,30 @@ function animate() {
   document.getElementById('land-txt').textContent  = landed ? 'FLY'  : 'LAND';
 
   const modeEl = document.getElementById('mode');
+  var safeLabel = (typeof inSafe !== 'undefined' && inSafe) ? ' &nbsp;⛨ SAFE' : '';
+  var caveLabel = (typeof inCave !== 'undefined' && inCave) ? ' &nbsp;🏔 CAVE' : '';
+  var babyLabel = babyDragons.length > 0 ? ' &nbsp;🐣×' + babyDragons.length : '';
   modeEl.innerHTML = landed
-    ? '🦎 <b>Exploring</b> — Land mode'
-    : '🐉 <b>Flying</b> — Wave ' + wave;
+    ? '🦎 <b>Exploring</b>' + caveLabel + safeLabel + babyLabel
+    : '🐉 <b>Flying</b> — Wave ' + wave + safeLabel + babyLabel;
+
+  // Treasure quest HUD
+  var tTotal = treasures.length;
+  var tFound = treasures.filter(function(t){return !t.active;}).length;
+  document.getElementById('tres-found').textContent = tFound;
+  document.getElementById('tres-total').textContent = tTotal;
+  // Egg HUD
+  var eTotal = dragonEggs.length;
+  var eFound = dragonEggs.filter(function(e){return !e.active;}).length;
+  document.getElementById('egg-count').textContent = eFound;
+  document.getElementById('egg-total').textContent = eTotal;
+  if (eFound === eTotal && eTotal > 0) {
+    document.getElementById('egg-hud').style.filter = 'drop-shadow(0 0 12px #80DDFF)';
+  }
+  // Glow gold when all found
+  if (tFound === tTotal && tTotal > 0) {
+    document.getElementById('quest').style.filter = 'drop-shadow(0 0 12px gold)';
+  }
 
   // Low-health vignette pulse
   const lv = Math.max(0, (30 - health) / 30);
