@@ -959,7 +959,7 @@ function buildBabyDragon(rarityIdx) {
   g.add(mkLeg(1,5*SC)); g.add(mkLeg(-1,5*SC));
   g.add(mkLeg(1,-4*SC)); g.add(mkLeg(-1,-4*SC));
 
-  scene.add(g);
+  // NOTE: caller (hatchBaby) positions then does scene.add
   return g;
 }
 
@@ -979,24 +979,29 @@ function hatchBaby(collectPos, rarityIdx) {
   }
 
   var mesh = buildBabyDragon(rarityIdx);
-  mesh.position.copy(collectPos);
-  mesh.position.y += 2;
+  // Spawn near current player position (egg has been collected, so use player pos)
+  mesh.position.set(
+    pd.position.x + (Math.random()-0.5)*6,
+    pd.position.y + 4,
+    pd.position.z + (Math.random()-0.5)*6
+  );
+  scene.add(mesh); // add AFTER positioning to avoid frame-0 origin flash
 
   var cols = EGG_RARITY_COLS[rarityIdx] || EGG_RARITY_COLS[0];
-  // Orbit offset: each baby fans out around the player
   var idx = babyDragons.length;
-  var orbitAngle = (idx / 8) * Math.PI * 2;  // spread evenly, up to 8
-  var orbitR = 14 + idx * 4;
+  // Orbit angle evenly spread; cap radius so babies stay visible
+  var orbitAngle = (idx / 8) * Math.PI * 2;
+  var orbitR = 13 + Math.min(idx, 5) * 3; // max ~28 units
 
   babyDragons.push({
     mesh: mesh,
     rarity: rarityIdx,
     orbitAngle: orbitAngle,
     orbitR: orbitR,
-    orbitSpeed: 0.6 + Math.random() * 0.3,
+    orbitSpeed: 0.55 + Math.random() * 0.3,
     phaseOffset: Math.random() * Math.PI * 2,
     wingT: 0,
-    fireCooldown: Math.floor(Math.random() * 20)  // stagger initial fire
+    fireCooldown: idx * 3  // stagger: first baby fires immediately, others stagger by 3 frames
   });
   sfxHatch();
 }
@@ -1496,13 +1501,17 @@ function fireBlast(dir) {
   g.position.copy(pos); scene.add(g);
   blasts.push({ mesh: g, vel: d.clone().multiplyScalar(5.5), life: 90, maxLife: 90 });
   sfxFire();
-  // Each hatched baby fires alongside the player
-  babyDragons.forEach(function(baby) {
-    if (baby.fireCooldown <= 0) {
-      babyFire(baby, d);
-      baby.fireCooldown = 8; // short stagger between babies
-    }
-  });
+  // Each hatched baby fires alongside the player (staggered by index, not all at once)
+  if (!landed) {
+    babyDragons.forEach(function(baby, bi) {
+      // Stagger: baby i fires bi*3 frames after player
+      setTimeout(function() {
+        if (!gameOn || baby.fireCooldown > 0) return;
+        babyFire(baby, d);
+        baby.fireCooldown = 14;
+      }, bi * 50);
+    });
+  }
 }
 
 function babyFire(baby, dirOverride) {
@@ -1583,6 +1592,14 @@ function drawMinimap() {
   bg.addColorStop(0, 'rgba(20,40,20,.95)'); bg.addColorStop(1, 'rgba(5,15,5,.95)');
   mmCtx.fillStyle = bg; mmCtx.beginPath(); mmCtx.arc(MM/2, MM/2, MM/2, 0, Math.PI*2); mmCtx.fill();
   const tp = function(x, z) { return [MM/2 + x/MMR*(MM/2), MM/2 + z/MMR*(MM/2)]; };
+  // Baby dragons (white dots near player)
+  babyDragons.forEach(function(baby) {
+    var p2 = tp(baby.mesh.position.x, baby.mesh.position.z);
+    mmCtx.fillStyle = 'rgba(255,255,255,.9)';
+    mmCtx.beginPath(); mmCtx.arc(p2[0], p2[1], 2.5, 0, Math.PI*2); mmCtx.fill();
+    mmCtx.strokeStyle = 'rgba(160,220,255,.6)'; mmCtx.lineWidth = 1;
+    mmCtx.stroke();
+  });
   // Dragon eggs
   dragonEggs.forEach(function(eg) {
     if (!eg.active) return;
@@ -1876,7 +1893,7 @@ function restartGame() {
   // Reset treasures
   treasures.forEach(function(tr) { tr.active = true; tr.mesh.visible = true; });
   // Reset eggs
-  dragonEggs.forEach(function(eg) { eg.active = true; eg.mesh.visible = true; });
+  dragonEggs.forEach(function(eg) { eg.active = true; eg.mesh.visible = true; eg._hatching = false; eg._hatchTimer = 0; });
   // Remove all hatched babies
   babyDragons.forEach(function(b) { if (b.mesh) scene.remove(b.mesh); });
   babyDragons.length = 0;
@@ -1999,8 +2016,8 @@ function animate() {
     const ty = terrainH(pd.position.x, pd.position.z);
     if (pd.position.y < ty + 9) { pd.position.y = ty + 9; if (velocity.y < 0) velocity.y = 0.35; }
 
-    // Fire (keyboard)
-    if ((K['Space']) && cooldown <= 0 && fireCharge >= 10) {
+    // Fire (keyboard) — only when flying
+    if ((K['Space']) && !landed && cooldown <= 0 && fireCharge >= 10) {
       fireBlast(); cooldown = 22; fireCharge = Math.max(0, fireCharge - 30);
     }
 
@@ -2184,6 +2201,34 @@ function animate() {
   // ── DRAGON EGGS ──────────────────────────────────────
   dragonEggs.forEach(function(eg) {
     if (!eg.active) return;
+
+    // Countdown hatch timer
+    if (eg._hatching && eg._hatchTimer !== undefined) {
+      eg._hatchTimer -= dt;
+      var urgency = Math.max(0, 1.0 - eg._hatchTimer / 5.0); // 0→1 over 5s
+
+      // Shake egg more as hatch approaches
+      if (eg._hatchTimer < 2.0) {
+        var shake = (2.0 - eg._hatchTimer) * 0.25;
+        eg.mesh.position.x = eg.pos.x + (Math.random()-0.5)*shake;
+        eg.mesh.position.z = eg.pos.z + (Math.random()-0.5)*shake;
+        eg.mesh.position.y = eg.pos.y + Math.abs(Math.sin(t * 18)) * shake;
+      }
+
+      // Brighten glow proportionally
+      var pulse = Math.sin(t * (2.2 + urgency * 6) + eg.pos.x) * 0.5 + 0.5;
+      eg.glow.intensity = (1.0 + urgency * 2.5) + pulse * (1.2 + urgency * 2);
+      eg.aura.material.opacity = 0.10 + urgency * 0.30 + pulse * 0.14;
+      eg.mesh.rotation.y += dt * (0.4 + urgency * 3);
+      eg.wisps.forEach(function(w, wi) {
+        var wa = t * (1.8 + urgency * 3) + wi * Math.PI / 2;
+        var wr = (3.5 + urgency * 2) + Math.sin(t + wi) * 0.5;
+        w.position.set(Math.cos(wa)*wr, 1.5 + Math.sin(t*1.1+wi)*1.2, Math.sin(wa)*wr);
+        w.material.opacity = 0.55 + urgency * 0.35 + pulse * 0.25;
+      });
+      return; // skip normal animation below while hatching
+    }
+
     var pulse = Math.sin(t * 2.2 + eg.pos.x) * 0.5 + 0.5;
     eg.glow.intensity = 1.0 + pulse * 1.2;
     eg.aura.material.opacity = 0.10 + pulse * 0.12;
@@ -2208,14 +2253,18 @@ function animate() {
       pfEl.style.background = 'rgba(80,200,255,.32)';
       pfEl.style.transition = 'none';
       setTimeout(function() { pfEl.style.background = 'rgba(80,200,255,0)'; pfEl.style.transition = 'background 1s'; }, 100);
-      // Hatch after 5 seconds
-      (function(rar, cPos) {
+      // Hatch after 5 seconds — shake egg shell 1 second before
+      (function(rar, eggRef) {
+        // Mark egg as hatching so animate loop can shake it
+        eggRef._hatchTimer = 5.0; // seconds remaining
+        eggRef._hatching = true;
         setTimeout(function() {
           if (!gameOn) return;
-          hatchBaby(cPos.clone(), rar);
+          eggRef._hatching = false;
+          hatchBaby(pd.position.clone(), rar);
           showPopup('🐣 A baby dragon hatched!');
         }, 5000);
-      })(eg.rarity, eg.mesh.position.clone());
+      })(eg.rarity, eg);
     }
   });
 
@@ -2231,12 +2280,18 @@ function animate() {
     var orb = baby.orbitAngle;
     var targetX = pd.position.x + Math.cos(orb) * baby.orbitR;
     var targetZ = pd.position.z + Math.sin(orb) * baby.orbitR;
-    var targetY = pd.position.y + 3 + Math.sin(t * 1.4 + baby.phaseOffset) * 3;
+    // Clamp baby height to at least terrain+6 so they never go underground
+    var bTerrain = terrainH(targetX, targetZ);
+    var targetY = Math.max(
+      bTerrain + 6,
+      pd.position.y + 3 + Math.sin(t * 1.4 + baby.phaseOffset) * 3
+    );
 
     // Smooth follow
-    baby.mesh.position.x += (targetX - baby.mesh.position.x) * 0.06;
-    baby.mesh.position.y += (targetY - baby.mesh.position.y) * 0.06;
-    baby.mesh.position.z += (targetZ - baby.mesh.position.z) * 0.06;
+    var lerpF = 0.07;
+    baby.mesh.position.x += (targetX - baby.mesh.position.x) * lerpF;
+    baby.mesh.position.y += (targetY - baby.mesh.position.y) * lerpF;
+    baby.mesh.position.z += (targetZ - baby.mesh.position.z) * lerpF;
 
     // Face the player dragon
     var toPlayer = pd.position.clone().sub(baby.mesh.position);
