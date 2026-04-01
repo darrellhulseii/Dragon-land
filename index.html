@@ -2119,7 +2119,7 @@ let mouseX = 0, mouseY = 0, locked = false;
 document.addEventListener('pointerlockchange', function() { locked = !!document.pointerLockElement; });
 document.addEventListener('mousemove', function(e) {
   if (!locked) return;
-  mouseX += e.movementX * 0.0018; mouseY += e.movementY * 0.0016;
+  mouseX += e.movementX * 0.003; mouseY += e.movementY * 0.0025;
   mouseY = Math.max(-0.75, Math.min(0.75, mouseY));
 });
 document.addEventListener('mousedown', function(e) {
@@ -2219,18 +2219,23 @@ setupBtn('btn-boost',
 );
 
 setupBtn('btn-land', function() {
-  if (!gameOn) return;
+  if (!gameOn || paused) return;
   if (!landed) {
     const tyl = terrainH(pd.position.x, pd.position.z);
-    if (pd.position.y < tyl + 40) {
+    if (pd.position.y < tyl + 22) {
+      // Close — snap land
       landed = true; pd.position.y = tyl + 5;
       velocity.set(0, 0, 0); pd.rotation.x = 0; pd.rotation.z = 0;
     } else {
-      // Dive to land — set a flag
+      // High — auto-descend
       tryLand = true;
     }
   } else {
-    landed = false; velocity.set(0, 3, 0);
+    // Take off with forward momentum
+    landed = false; tryLand = false;
+    const launchDir = new THREE.Vector3(Math.sin(pd.rotation.y), 0.6, Math.cos(pd.rotation.y)).normalize();
+    velocity.copy(launchDir.multiplyScalar(3.5));
+    pd.rotation.x = -0.25;
   }
 }, null);
 
@@ -2473,7 +2478,7 @@ function animate() {
 
   // ── COMBINED INPUT (keyboard + joystick) ─────────────
   // Large deadzone — resting thumb never drifts
-  const JDZ = 0.25;
+  const JDZ = 0.12;
   const lax = Math.abs(joyL.ax) > JDZ ? (joyL.ax - Math.sign(joyL.ax) * JDZ) / (1 - JDZ) : 0;
   const lay = Math.abs(joyL.ay) > JDZ ? (joyL.ay - Math.sign(joyL.ay) * JDZ) / (1 - JDZ) : 0;
 
@@ -2490,132 +2495,160 @@ function animate() {
   const pA = Math.max(-1, Math.min(1, pitchAmt));
 
   // Right joystick -> camera look — large deadzone, very slow accumulation
-  const RDZ = 0.25;
+  const RDZ = 0.12;
   const rax = Math.abs(joyR.ax) > RDZ ? (joyR.ax - Math.sign(joyR.ax) * RDZ) / (1 - RDZ) : 0;
   const ray = Math.abs(joyR.ay) > RDZ ? (joyR.ay - Math.sign(joyR.ay) * RDZ) / (1 - RDZ) : 0;
   const rjoyActive = joyR.active && (rax !== 0 || ray !== 0);
   if (rjoyActive) {
-    mouseX += rax * 0.005;
-    mouseY += ray * 0.005;
-    mouseY = Math.max(-0.5, Math.min(0.5, mouseY));
+    mouseX += rax * 0.012;
+    mouseY += ray * 0.010;
+    mouseY = Math.max(-0.65, Math.min(0.65, mouseY));
   }
 
   // Auto-land approach if tryLand
+  // ── AUTO-LAND APPROACH ──────────────────────────────
   if (tryLand && !landed) {
-    pd.rotation.x = Math.min(pd.rotation.x + 0.006, 0.2);
+    // Tilt nose down toward terrain, slow down
+    pd.rotation.x += (0.18 - pd.rotation.x) * 0.04;
+    velocity.multiplyScalar(0.97); // bleed speed
+    pd.position.add(velocity);
     const tyl2 = terrainH(pd.position.x, pd.position.z);
-    if (pd.position.y < tyl2 + 14) {
+    if (pd.position.y < tyl2 + 10) {
       landed = true; tryLand = false; pd.position.y = tyl2 + 5;
       velocity.set(0, 0, 0); pd.rotation.x = 0; pd.rotation.z = 0;
     }
-  }
+    // Safety: if we overshoot above 400m abort auto-land
+    if (pd.position.y > 400) tryLand = false;
+  } else if (!landed) {
+    // ── FREE FLIGHT ─────────────────────────────────────
 
-  if (!landed) {
-    // ── FLIGHT ──────────────────────────────────────────
-    // Very gentle rates — easy to hold a course, no twitching
-    const BASE_YR = 0.009; // yaw  — about 0.5°/frame
-    const BASE_PR = 0.007; // pitch — about 0.4°/frame
-
+    // Turn rate (yaw)
+    const BASE_YR = 0.028;
     pd.rotation.y += tA * BASE_YR;
-    // Pitch limit ±20° — hard to accidentally dive straight down
-    pd.rotation.x  = Math.max(-Math.PI / 9,
-                       Math.min( Math.PI / 9,
-                         pd.rotation.x - pA * BASE_PR));
 
-    // Auto-level: when stick released, pitch gently returns to 0
-    if (Math.abs(pA) < 0.05) {
-      pd.rotation.x *= 0.97; // drifts back to level in ~1 second
+    // Pitch — full ±50° range so dragon can actually climb and dive
+    const BASE_PR = 0.028;
+    const PITCH_MAX = Math.PI / 3.6; // ±50°
+    pd.rotation.x = Math.max(-PITCH_MAX, Math.min(PITCH_MAX,
+      pd.rotation.x - pA * BASE_PR));
+
+    // Soft auto-level only when no pitch input AND near level — doesn't fight intentional angles
+    if (Math.abs(pA) < 0.05 && Math.abs(pd.rotation.x) < 0.12) {
+      pd.rotation.x *= 0.92;
     }
 
-    // Mouse / right joystick — very gentle, slow decay
+    // Mouse / right joystick look — gentle
     if (locked || rjoyActive) {
-      pd.rotation.y -= mouseX * 0.14;
-      pd.rotation.x -= mouseY * 0.10;
-      pd.rotation.x = Math.max(-Math.PI / 9, Math.min(Math.PI / 9, pd.rotation.x));
-      mouseX *= 0.93; mouseY *= 0.93;
+      pd.rotation.y -= mouseX * 0.22;
+      pd.rotation.x -= mouseY * 0.16;
+      pd.rotation.x = Math.max(-PITCH_MAX, Math.min(PITCH_MAX, pd.rotation.x));
+      mouseX *= 0.88; mouseY *= 0.88;
     }
 
-    // Banking roll — very subtle lean
-    pd.rotation.z += (tA * 0.18 - pd.rotation.z) * 0.04;
+    // Banking roll — follows yaw input
+    pd.rotation.z += (tA * 0.32 - pd.rotation.z) * 0.07;
 
-    // Speed — comfortable cruise, meaningful boost
-    const spd = boost ? 4.2 : 2.4;
+    // Forward thrust along nose direction — full 3D
+    const spd = boost ? 6.0 : 3.4;
     document.getElementById('brow').style.opacity = boost ? '0.9' : '0';
     const fwd = new THREE.Vector3(0, 0, 1).applyQuaternion(pd.quaternion);
-    velocity.lerp(fwd.multiplyScalar(spd), 0.05);
+    velocity.lerp(fwd.multiplyScalar(spd), 0.10);
     pd.position.add(velocity);
 
-    // Terrain bounce
+    // Terrain: bounce off ground
     const ty = terrainH(pd.position.x, pd.position.z);
-    if (pd.position.y < ty + 9) { pd.position.y = ty + 9; if (velocity.y < 0) velocity.y = 0.35; }
+    if (pd.position.y < ty + 8) {
+      pd.position.y = ty + 8;
+      if (velocity.y < 0) velocity.y = 0.5;
+      // Auto-bounce: level off to prevent repeated ground strikes
+      pd.rotation.x *= 0.7;
+    }
 
-    // Fire (keyboard) — only when flying
-    if ((K['Space']) && !paused && !landed && cooldown <= 0 && fireCharge >= 10) {
+    // Fire (keyboard)
+    if (K['Space'] && !paused && cooldown <= 0 && fireCharge >= 10) {
       fireBlast(); cooldown = 22; fireCharge = Math.max(0, fireCharge - 30);
     }
 
-    // Land (keyboard)
+    // Land key — triggers auto-descent regardless of altitude
     if (K['KeyL'] && !paused) {
       const tyl = terrainH(pd.position.x, pd.position.z);
-      if (pd.position.y < tyl + 35) {
+      if (pd.position.y < tyl + 22) {
+        // Close enough — snap land
         landed = true; pd.position.y = tyl + 5;
         velocity.set(0, 0, 0); pd.rotation.x = 0; pd.rotation.z = 0;
+      } else {
+        // High up — start auto-descent
+        tryLand = true;
       }
     }
 
     // Wing flap
-    const fa = boost ? 0.7 : 0.5;
+    const fa = boost ? 0.75 : 0.52;
     const fv = Math.sin(wingT) * fa;
     pd.rightWingGroup.rotation.z = fv;
     pd.leftWingGroup.rotation.z  = -fv;
+
     // Earth magic aura pulse
     if (pd._aura) {
       pd._aura.material.opacity = 0.03 + Math.sin(t * 1.8) * 0.015;
-      if (inSafe) pd._aura.material.opacity += 0.04; // brighter in safe zone
+      if (inSafe) pd._aura.material.opacity += 0.04;
     }
 
-    // Head gentle tracking bob
+    // Head bob + nostril flicker
     if (pd.headGroup) {
       pd.headGroup.rotation.x = Math.sin(t * 0.7) * 0.04;
-      // Nose fire glow flicker — find nostril children (MeshBasicMaterial color 0xFF6622)
       pd.headGroup.children.forEach(function(ch) {
         if (ch.material && ch.material.color && ch.material.transparent) {
           var hsl = {}; ch.material.color.getHSL(hsl);
-          if (hsl.h > 0.03 && hsl.h < 0.12) { // orange-red hue = nostril
+          if (hsl.h > 0.03 && hsl.h < 0.12) {
             ch.material.opacity = 0.6 + Math.sin(t * 8 + 1.2) * 0.25;
           }
         }
       });
     }
-    // Camera follow
-    const camOff = new THREE.Vector3(0, 10, -30).applyQuaternion(pd.quaternion);
-    camera.position.lerp(pd.position.clone().add(camOff), 0.1);
-    camera.lookAt(pd.position.clone().add(new THREE.Vector3(0, 3, 0)));
+
+    // Camera — pulls back and up, follows dragon orientation
+    const camOff = new THREE.Vector3(0, 10, -32).applyQuaternion(pd.quaternion);
+    camera.position.lerp(pd.position.clone().add(camOff), 0.12);
+    camera.lookAt(pd.position.clone().add(new THREE.Vector3(0, 2, 0)));
 
     // Gauges
-    const alt = Math.round(Math.max(0, pd.position.y - terrainH(pd.position.x, pd.position.z)));
+    const alt = Math.round(Math.max(0, pd.position.y - ty));
     document.getElementById('alt-n').textContent = alt + 'm';
     document.getElementById('spd-n').textContent = Math.round(velocity.length() * 10);
 
   } else {
-    // ── GROUND WALK ─────────────────────────────────────
-    pd.rotation.y += tA * 0.022;
-    const wf = new THREE.Vector3(Math.sin(pd.rotation.y), 0, Math.cos(pd.rotation.y));
-    if (pA > 0.1)  pd.position.add(wf.clone().multiplyScalar(0.28));
-    if (pA < -0.1) pd.position.add(wf.clone().multiplyScalar(-0.28));
-    pd.position.y    = terrainH(pd.position.x, pd.position.z) + 5;
-    pd.rotation.x    = 0; pd.rotation.z = 0;
+    // ── GROUNDED / WALK ──────────────────────────────────
+    // Turn with left stick
+    pd.rotation.y += tA * 0.045;
 
+    // Walk forward / back with pitch stick
+    const wf = new THREE.Vector3(Math.sin(pd.rotation.y), 0, Math.cos(pd.rotation.y));
+    if (pA > 0.08)  pd.position.add(wf.clone().multiplyScalar(0.32 * pA));
+    if (pA < -0.08) pd.position.add(wf.clone().multiplyScalar(0.32 * pA));
+
+    // Snap to terrain
+    pd.position.y = terrainH(pd.position.x, pd.position.z) + 5;
+    pd.rotation.x = 0; pd.rotation.z = 0;
+
+    // Wings fold when landed
     const fv2 = -Math.PI / 4 + Math.sin(wingT) * 0.04;
     pd.rightWingGroup.rotation.z = fv2;
     pd.leftWingGroup.rotation.z  = -fv2;
 
-    if ((K['KeyF'] || K['Space']) && !paused) { landed = false; velocity.set(0, 3, 0); }
+    // Take off — F or Space
+    if ((K['KeyF'] || K['Space']) && !paused) {
+      landed = false; tryLand = false;
+      // Launch upward and forward
+      const launchDir = new THREE.Vector3(Math.sin(pd.rotation.y), 0.6, Math.cos(pd.rotation.y)).normalize();
+      velocity.copy(launchDir.multiplyScalar(3.5));
+      pd.rotation.x = -0.25; // nose-up launch attitude
+    }
 
-    // Ground camera
-    const cx = pd.position.x - Math.sin(pd.rotation.y) * 26;
-    const cz = pd.position.z - Math.cos(pd.rotation.y) * 26;
-    camera.position.lerp(new THREE.Vector3(cx, pd.position.y + 14, cz), 0.1);
+    // Ground camera: behind and above
+    const cx = pd.position.x - Math.sin(pd.rotation.y) * 28;
+    const cz = pd.position.z - Math.cos(pd.rotation.y) * 28;
+    camera.position.lerp(new THREE.Vector3(cx, pd.position.y + 16, cz), 0.1);
     camera.lookAt(pd.position.clone().add(new THREE.Vector3(0, 5, 0)));
 
     document.getElementById('alt-n').textContent = '0m';
