@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Dragon Rider — Flight of Fire</title>
+<title>Dragon Rider — Głaz · Incendio I · Earth/Fire</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&display=swap');
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
@@ -45,6 +45,83 @@ canvas{display:block;position:fixed;top:0;left:0}
 
 /* Popup */
 #popup{position:absolute;top:38%;left:50%;transform:translateX(-50%);font-size:26px;font-weight:900;color:#FFD140;text-shadow:0 0 28px rgba(255,210,0,1);opacity:0;pointer-events:none;white-space:nowrap}
+
+/* Dragon identity card */
+#dragon-card{
+position:absolute;bottom:195px;left:12px;
+pointer-events:none;
+}
+.dcard{
+background:linear-gradient(135deg,rgba(5,20,5,.9),rgba(10,30,5,.82));
+border:1px solid rgba(91,247,48,.22);
+border-radius:10px;padding:8px 12px;backdrop-filter:blur(6px);
+box-shadow:0 0 16px rgba(91,247,48,.12),0 4px 20px rgba(0,0,0,.5);
+max-width:170px;
+}
+.dname{font-size:9px;color:rgba(91,247,48,.9);letter-spacing:1px;line-height:1.5;font-weight:700}
+.dattrs{display:flex;gap:6px;margin-top:5px;flex-wrap:wrap}
+.dattr{font-size:8px;letter-spacing:1px;padding:2px 6px;border-radius:4px;color:#fff;opacity:.8}
+.dattr-fire{background:rgba(255,80,0,.35);border:1px solid rgba(255,80,0,.3)}
+.dattr-earth{background:rgba(80,160,40,.35);border:1px solid rgba(80,160,40,.3)}
+.dattr-water{background:rgba(40,100,200,.35);border:1px solid rgba(40,100,200,.3)}
+.dmagic{font-size:8px;color:rgba(91,247,48,.5);letter-spacing:1px;margin-top:4px}
+
+/* Dragon name intro */
+#dragon-intro{
+position:absolute;inset:0;
+display:flex;flex-direction:column;align-items:center;justify-content:center;
+pointer-events:none;
+opacity:0;transition:opacity .5s;
+}
+#dragon-intro.show{opacity:1}
+#dragon-intro-name{
+font-size:clamp(14px,2.5vw,22px);font-weight:900;
+color:#5BF730;text-shadow:0 0 30px rgba(91,247,48,.9),0 0 60px rgba(91,247,48,.3);
+letter-spacing:3px;text-align:center;padding:0 20px;line-height:1.5;
+}
+#dragon-intro-sub{
+font-size:11px;letter-spacing:2px;
+color:rgba(91,247,48,.55);margin-top:8px;text-align:center;
+}
+#dragon-intro-bar{
+width:180px;height:2px;background:linear-gradient(90deg,transparent,#5BF730,transparent);
+margin-top:10px;opacity:.6;
+}
+
+/* XP / Level bar */
+#xp-bar-wrap{position:absolute;bottom:185px;left:50%;transform:translateX(-50%);width:220px;pointer-events:none;text-align:center}
+#xp-bar-outer{height:6px;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden;border:1px solid rgba(180,140,255,.2);margin-top:3px}
+#xp-bar-fill{height:100%;background:linear-gradient(90deg,#9955FF,#DD88FF);border-radius:4px;transition:width .4s}
+#xp-label{font-size:9px;letter-spacing:2px;color:rgba(180,140,255,.7);white-space:nowrap}
+#level-up-flash{position:absolute;inset:0;pointer-events:none;background:rgba(150,80,255,0);transition:background .12s}
+
+/* Combo counter */
+#combo{position:absolute;top:46%;left:50%;transform:translateX(-50%);font-size:28px;font-weight:900;letter-spacing:3px;color:#FFD140;text-shadow:0 0 22px rgba(255,200,0,.9);opacity:0;pointer-events:none;white-space:nowrap;transition:none}
+
+/* Weather overlay */
+#weather-overlay{position:absolute;inset:0;pointer-events:none;background:rgba(30,40,60,0);transition:background 3s}
+#lightning-flash{position:absolute;inset:0;pointer-events:none;background:rgba(200,220,255,0)}
+
+/* Pause button */
+#btn-pause{
+position:absolute;top:12px;left:50%;transform:translateX(-50%);margin-top:152px;
+width:44px;height:44px;border-radius:50%;
+background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.2);
+display:flex;align-items:center;justify-content:center;font-size:18px;
+cursor:pointer;pointer-events:all;backdrop-filter:blur(6px);
+}
+#pause-screen{
+position:fixed;inset:0;background:rgba(0,0,0,.82);
+display:none;flex-direction:column;align-items:center;justify-content:center;
+z-index:50;pointer-events:all;text-align:center;
+}
+#pause-screen h2{font-size:42px;font-weight:900;color:#FFD140;letter-spacing:6px;margin-bottom:18px;text-shadow:0 0 40px rgba(255,200,0,.8)}
+#pause-screen p{font-size:14px;color:rgba(255,255,255,.6);letter-spacing:2px;margin-bottom:6px}
+.presume{margin-top:22px;font-size:14px;letter-spacing:3px;color:#FF8844;cursor:pointer;border:1px solid rgba(255,130,0,.3);padding:12px 28px;border-radius:8px;background:rgba(255,80,0,.1)}
+
+/* High score badge */
+#hi-score{position:absolute;bottom:185px;right:12px;font-size:8px;letter-spacing:2px;color:rgba(255,210,0,.55);text-align:right;pointer-events:none}
+#hi-score span{display:block;font-size:14px;font-weight:900;color:rgba(255,210,0,.8)}
 #wbanner{position:absolute;top:22%;left:50%;transform:translateX(-50%);font-size:22px;font-weight:900;letter-spacing:4px;color:#FF8844;text-shadow:0 0 36px rgba(255,100,0,.9);opacity:0;pointer-events:none;white-space:nowrap;text-align:center;width:90vw}
 
 /* Damage / vignette */
@@ -330,6 +407,47 @@ padding:20px;overflow-y:auto;
   <div id="cave-overlay"></div>
   <div id="safezone">⛨ SAFE ZONE — Resting</div>
 
+  <!-- Dragon identity card -->
+
+  <div id="dragon-card">
+    <div class="dcard">
+      <div class="dname">🐉 Głaz · Сӯзондан<br>Áin · Incendio I</div>
+      <div class="dattrs">
+        <span class="dattr dattr-earth">🌍 EARTH</span>
+        <span class="dattr dattr-fire">🔥 FIRE</span>
+        <span class="dattr">♀ FEMALE</span>
+      </div>
+      <div class="dmagic">Magic ×1.09 &nbsp;·&nbsp; Agility ×0.92</div>
+    </div>
+  </div>
+
+  <!-- Dragon reveal intro -->
+
+  <div id="dragon-intro">
+    <div id="dragon-intro-name">Głaz - Сӯзондан - Áin - Incendio I</div>
+    <div id="dragon-intro-sub">Primal Dragon of the House EARTH · Fire Magic · Age I</div>
+    <div id="dragon-intro-bar"></div>
+  </div>
+
+  <!-- XP / Level -->
+
+  <div id="xp-bar-wrap">
+    <div id="xp-label">⭐ LVL <span id="lvl-num">1</span> &nbsp;—&nbsp; <span id="xp-num">0</span> / <span id="xp-max">100</span> XP</div>
+    <div id="xp-bar-outer"><div id="xp-bar-fill" style="width:0%"></div></div>
+  </div>
+  <div id="level-up-flash"></div>
+  <div id="combo"></div>
+  <div id="weather-overlay"></div>
+  <div id="lightning-flash"></div>
+
+  <!-- High score -->
+
+  <div id="hi-score">BEST<span id="hi-val">0</span></div>
+
+  <!-- Pause button -->
+
+  <div id="btn-pause" onclick="togglePause()">⏸</div>
+
   <!-- Treasure quest tracker -->
 
   <div id="quest">
@@ -388,7 +506,8 @@ padding:20px;overflow-y:auto;
     <div><span class="k">🛬 LAND / L</span><br>Land &amp; explore</div>
     <div><span class="k">🛫 TAKEOFF / F</span><br>Launch into sky</div>
   </div>
-  <p class="hints">⭐ Hoops +100 &nbsp;•&nbsp; 🔥 Slay dragons +500×wave &nbsp;•&nbsp; 💊 Orbs: HP &amp; fire &nbsp;•&nbsp; 💰 Chests +300 &amp; bonus</p>
+  <p class="hints" style="color:rgba(91,247,48,.8);font-size:12px;letter-spacing:1px;margin-bottom:6px">🐉 You ride <b style="color:#5BF730">Głaz · Incendio I</b> — Earth/Fire Dragon, Age I · Green Fire Magic</p>
+  <p class="hints">⭐ Hoops +100 &nbsp;•&nbsp; 🔥 Slay dragons +500×wave &nbsp;•&nbsp; 💊 Orbs: HP &amp; fire &nbsp;•&nbsp; 💰 Chests +300</p>
   <p class="hints" style="color:rgba(100,255,180,.7)">🏔 Explore caves to find hidden treasure &nbsp;•&nbsp; ⛨ Safe zones heal you &amp; pause enemies</p>
   <p class="warn">⚠ Enemy dragons shoot fire back! Seek safe zones to recover. Collect all treasure chests!</p>
   <div class="cta">— TAP TO MOUNT YOUR DRAGON —</div>
@@ -399,6 +518,14 @@ padding:20px;overflow-y:auto;
   <p id="ds">Final Score: 0</p>
   <p id="dk">Dragons Slain: 0</p>
   <div class="restart" onclick="restartGame()">— RISE AGAIN —</div>
+</div>
+
+<div id="pause-screen">
+  <h2>⏸ PAUSED</h2>
+  <p id="pause-score">Score: 0</p>
+  <p id="pause-wave">Wave: 1</p>
+  <p id="pause-lvl">Dragon Level: 1</p>
+  <div class="presume" onclick="togglePause()">▶ RESUME</div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -455,6 +582,10 @@ function sfxHatch(){
   setTimeout(function(){ [480,640,800,1040].forEach(function(f,i){ setTimeout(function(){ playTone(f,'triangle',0.18,0.25); }, i*55); }); }, 120);
 }
 function sfxBabyFire(){ playTone(300,'sawtooth',0.08,0.18,(o,ac)=>{ o.frequency.exponentialRampToValueAtTime(120,ac.currentTime+0.08); }); }
+function sfxLevelUp(){ [220,330,550,880,1320].forEach((f,i)=>setTimeout(()=>playTone(f,'sine',0.28,0.22),i*65)); }
+function sfxCombo(n){ playTone(300+n*80,'triangle',0.12,0.25); }
+function sfxLightning(){ playNoise(0.18,0.9,3000); playTone(60,'sawtooth',0.15,0.4,(o,ac)=>o.frequency.exponentialRampToValueAtTime(40,ac.currentTime+0.15)); }
+function sfxBoss(){ [80,60,40].forEach((f,i)=>setTimeout(()=>playTone(f,'sawtooth',0.5,0.35),i*120)); }
 
 // ════════════════════════════════════════════════════════
 //  RENDERER
@@ -1007,9 +1138,237 @@ function hatchBaby(collectPos, rarityIdx) {
 }
 
 // ════════════════════════════════════════════════════════
+//  GENOME DRAGON — Głaz · Сӯзондан · Áin · Incendio I
+//  House: EARTH | Magic: FIRE | Sex: FEMALE | Age: I
+//  Primal:    HSV(107,80,97)  = #5BF730  lime green
+//  Companion: HSV(81,51,18)   = #262D16  dark olive
+//  Pattern:   HSV(339,95,3)   = #070002  near black
+//  Eyes:      HSV(330,30,95)  = #F2AACE  rose pink
+// ════════════════════════════════════════════════════════
+function buildGenomeDragon() {
+  var g = new THREE.Group();
+
+  // Zone-blended materials
+  var torsoMat  = new THREE.MeshLambertMaterial({ color: 0x3B941F }); // primal dominant - bright green
+  var neckMat   = new THREE.MeshLambertMaterial({ color: 0x284816 }); // companion - dark olive
+  var headMat   = new THREE.MeshLambertMaterial({ color: 0x39801F }); // head blend - med green
+  var legMat    = new THREE.MeshLambertMaterial({ color: 0x223312 }); // companion dominant - deep olive
+  var tailMat   = new THREE.MeshLambertMaterial({ color: 0x274F14 }); // pattern dominant - dark
+  var wingMat   = new THREE.MeshLambertMaterial({ color: 0x244113, side: THREE.DoubleSide, transparent: true, opacity: 0.82 });
+  var bellyMat  = new THREE.MeshLambertMaterial({ color: 0xD4C89A }); // warm cream belly
+  var hornMat   = new THREE.MeshLambertMaterial({ color: 0x070002 }); // near black pattern
+  var spikeMat  = new THREE.MeshLambertMaterial({ color: 0x1A3808 }); // dark olive-black spikes
+  var clawMat   = new THREE.MeshLambertMaterial({ color: 0x0D1F04 }); // very dark claws
+  var eyeMat    = new THREE.MeshBasicMaterial({ color: 0xF2AACE });   // rose pink eyes
+  var pupilMat  = new THREE.MeshBasicMaterial({ color: 0x1A0010 });   // near-black pupils
+  var eyeGlowM  = new THREE.MeshBasicMaterial({ color: 0xFF88CC, transparent: true, opacity: 0.3 });
+  var nostrilM  = new THREE.MeshBasicMaterial({ color: 0xFF6622, transparent: true, opacity: 0.85 });
+  var toothMat  = new THREE.MeshLambertMaterial({ color: 0xF0E8C0 });
+
+  // ── BODY (torso) ────────────────────────────────────────
+  // size gene = 0.94, so slightly smaller than max
+  var SIZE = 0.95;
+  var body = new THREE.Mesh(new THREE.CylinderGeometry(2.65*SIZE, 3.6*SIZE, 15*SIZE, 10), torsoMat);
+  body.rotation.x = Math.PI/2; body.castShadow = true; g.add(body);
+
+  // Belly plate (chestStrength=2)
+  var belly = new THREE.Mesh(new THREE.CylinderGeometry(1.9*SIZE, 2.85*SIZE, 11*SIZE, 9), bellyMat);
+  belly.rotation.x = Math.PI/2; belly.position.set(0, -1.7, 0); g.add(belly);
+
+  // Scale bumps on torso (scales=5 = max) - small hemispheres
+  var scaleMat = new THREE.MeshLambertMaterial({ color: 0x4AAA24 });
+  for (var si=0; si<18; si++) {
+    var sca = new THREE.Mesh(new THREE.SphereGeometry(0.38, 5, 4), scaleMat);
+    var sa = (si/18)*Math.PI*2;
+    var sy = Math.sin(si*0.8)*5-1;
+    sca.position.set(Math.cos(sa)*2.85*SIZE, Math.sin(sa)*2.85*SIZE*0.5, sy);
+    sca.scale.y = 0.4; g.add(sca);
+  }
+
+  // ── NECK (neckSpikes=0 — smooth neck) ───────────────────
+  var neck = new THREE.Mesh(new THREE.CylinderGeometry(1.55, 2.1, 7, 8), neckMat);
+  neck.position.set(0, 2.7*SIZE, 9.5*SIZE); neck.rotation.x = -Math.PI/5;
+  neck.castShadow = true; g.add(neck);
+
+  // ── HEAD GROUP ──────────────────────────────────────────
+  var hg = new THREE.Group();
+
+  // Skull
+  var skull = new THREE.Mesh(new THREE.BoxGeometry(4.2, 3.1, 4.8), headMat);
+  skull.castShadow = true; hg.add(skull);
+
+  // Snout (snout=5 = very long, narrow) — extra long snout
+  var snoutLen = 7.0; // max length for snout=5
+  var snout = new THREE.Mesh(new THREE.BoxGeometry(2.8, 1.8, snoutLen), headMat);
+  snout.position.set(0, -0.25, 4.8 + snoutLen/2 - 0.5); hg.add(snout);
+
+  // Snout ridge (decorative)
+  var snoutRidge = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.35, snoutLen, 6), spikeMat);
+  snoutRidge.rotation.x = Math.PI/2; snoutRidge.position.set(0, 0.7, 4.8 + snoutLen/2 - 0.5);
+  hg.add(snoutRidge);
+
+  // Jaw
+  var jaw = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.85, 6.5), bellyMat);
+  jaw.position.set(0, -1.55, 5.5); hg.add(jaw);
+
+  // Teeth (more teeth for long snout)
+  [-1.4, -0.5, 0.5, 1.4].forEach(function(tx) {
+    var tooth = new THREE.Mesh(new THREE.ConeGeometry(0.2, 0.85, 4), toothMat);
+    tooth.rotation.x = Math.PI; tooth.position.set(tx, -0.9, 8.2); hg.add(tooth);
+    // Upper fangs
+    var ufang = new THREE.Mesh(new THREE.ConeGeometry(0.18, 0.7, 4), toothMat);
+    ufang.position.set(tx, -0.7, 8.0); hg.add(ufang);
+  });
+
+  // EYES — rose pink (HSV 330,30,95) — large, slightly raised
+  [-1, 1].forEach(function(s) {
+    var eye = new THREE.Mesh(new THREE.SphereGeometry(0.62, 9, 7), eyeMat);
+    eye.position.set(s*2.0, 1.15, 2.0); hg.add(eye);
+    var pup = new THREE.Mesh(new THREE.SphereGeometry(0.32, 7, 5), pupilMat);
+    pup.position.set(s*2.25, 1.18, 2.3); hg.add(pup);
+    var eglow = new THREE.Mesh(new THREE.SphereGeometry(0.78, 7, 5), eyeGlowM);
+    eglow.position.copy(eye.position); hg.add(eglow);
+    // Slit pupil (eye shine)
+    var shine = new THREE.Mesh(new THREE.SphereGeometry(0.15, 5, 4),
+      new THREE.MeshBasicMaterial({ color: 0xFFCCEE }));
+    shine.position.set(s*2.3, 1.25, 2.45); hg.add(shine);
+  });
+
+  // HORNS (horns=2 — paired, back-swept) — dark
+  [-1, 1].forEach(function(s) {
+    var horn = new THREE.Mesh(new THREE.ConeGeometry(0.38, 4.2, 5), hornMat);
+    horn.position.set(s*1.7, 2.4, -0.5);
+    horn.rotation.z = s*0.32; horn.rotation.x = -0.25; hg.add(horn);
+    // Horn base ring
+    var hbase = new THREE.Mesh(new THREE.TorusGeometry(0.42, 0.12, 5, 10), spikeMat);
+    hbase.rotation.x = Math.PI/2; hbase.position.set(s*1.7, 2.1, -0.5); hg.add(hbase);
+  });
+
+  // HEAD SPIKES (headSpikes=3 — along the crown)
+  [0.4, 1.6, -0.8].forEach(function(hz, hi) {
+    var hs = new THREE.Mesh(new THREE.ConeGeometry(0.22-hi*0.03, 1.8-hi*0.3, 5), spikeMat);
+    hs.position.set(0, 2.8, hz); hg.add(hs);
+  });
+
+  // Nostril glow (fire magic)
+  [-0.55, 0.55].forEach(function(nx) {
+    var n = new THREE.Mesh(new THREE.SphereGeometry(0.22, 6, 4), nostrilM);
+    n.position.set(nx, -0.45, 7.0+snoutLen/2); hg.add(n);
+  });
+
+  hg.position.set(0, 5.5, 14); g.add(hg); g.headGroup = hg;
+
+  // ── WINGS (wingStrength=1 light/thin; wingSkin=4 leathery; wingClaws=4) ────
+  function makeWing(side) {
+    var wg = new THREE.Group();
+    var sh = new THREE.Shape();
+    // Larger, more swept wing for wingSkin=4
+    sh.moveTo(0, 2); sh.lineTo(side*5, 4.5); sh.lineTo(side*22, 2);
+    sh.lineTo(side*25, -2); sh.lineTo(side*20, -8); sh.lineTo(side*13, -13);
+    sh.lineTo(side*6, -11); sh.lineTo(side*2, -5); sh.lineTo(0, -2); sh.lineTo(0, 2);
+    var wm = new THREE.Mesh(new THREE.ShapeGeometry(sh), wingMat);
+    wm.rotation.x = -Math.PI/2; wg.add(wm);
+
+    // Wing veins (dark pattern overlay)
+    var veinMat = new THREE.MeshBasicMaterial({ color: 0x070002, transparent: true, opacity: 0.35, side: THREE.DoubleSide });
+    for (var vn=0; vn<3; vn++) {
+      var vein = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.18, (14-vn*3)),
+        veinMat);
+      vein.rotation.x = -Math.PI/2;
+      vein.rotation.z = side*(0.18+vn*0.22);
+      vein.position.set(side*(6+vn*4), 0.05, -vn*2.5);
+      wg.add(vein);
+    }
+
+    // Wing spars
+    for (var sp=0; sp<5; sp++) {
+      var spar = new THREE.Mesh(new THREE.CylinderGeometry(0.14-sp*0.02, 0.07, 16-sp*2.8, 4), tailMat);
+      spar.rotation.z = Math.PI/2; spar.position.set(side*(5+sp*4), 0.15, -sp*1.8); wg.add(spar);
+    }
+
+    // Wing claws (wingClaws=4) — 4 claws at wing elbow
+    for (var wc=0; wc<4; wc++) {
+      var wclaw = new THREE.Mesh(new THREE.ConeGeometry(0.18, 1.1, 4), clawMat);
+      wclaw.position.set(side*(5+wc*1.4), 0.3, -1.5-wc*0.4);
+      wclaw.rotation.x = 0.4; wclaw.rotation.z = side*0.3; wg.add(wclaw);
+    }
+
+    wg.position.set(0, 1.5, 0); return wg;
+  }
+  var rwg = makeWing(1), lwg = makeWing(-1);
+  g.add(rwg); g.add(lwg); g.rightWingGroup = rwg; g.leftWingGroup = lwg;
+
+  // ── BACK SPIKES (backSpikes=1 — single minimal ridge) ──
+  // Just one central dorsal fin-like ridge
+  for (var bi=0; bi<5; bi++) {
+    var bfin = new THREE.Mesh(new THREE.ConeGeometry(0.22-bi*0.03, 2.2-bi*0.3, 4), spikeMat);
+    bfin.position.set(0, 3.2-bi*0.05, 5-bi*2.6); g.add(bfin);
+  }
+
+  // ── TAIL (tailLength=2, tailStrength=5, tailSpikes=1, tailFin=1) ──
+  // Strong, thick tail tapering to dark tip
+  var tailSegs = 10;
+  for (var ti=1; ti<=tailSegs; ti++) {
+    var tr2 = Math.max((3.2 - ti*0.27)*SIZE, 0.4);
+    var tcol = ti <= 4 ? torsoMat : ti <= 7 ? tailMat : hornMat;
+    var ts = new THREE.Mesh(new THREE.SphereGeometry(tr2, 8, 6), tcol);
+    ts.position.set(0, -ti*0.55, -8-ti*2.4); ts.castShadow = true; g.add(ts);
+  }
+
+  // Tail spike (tailSpikes=1)
+  var tspike = new THREE.Mesh(new THREE.ConeGeometry(1.0, 4.5, 5), hornMat);
+  tspike.rotation.x = Math.PI/2; tspike.position.set(0, -6, -33); g.add(tspike);
+
+  // Tail fin (tailFin=1) — flat fin on upper tail
+  var finShape = new THREE.Shape();
+  finShape.moveTo(0,0); finShape.lineTo(1.5,3); finShape.lineTo(3,4); finShape.lineTo(6,3.5);
+  finShape.lineTo(8,2); finShape.lineTo(8,0); finShape.lineTo(0,0);
+  var finGeo = new THREE.ShapeGeometry(finShape);
+  var fin3d = new THREE.Mesh(finGeo, new THREE.MeshLambertMaterial({ color: 0x1A3808, side: THREE.DoubleSide }));
+  fin3d.rotation.y = Math.PI/2; fin3d.rotation.z = Math.PI/2;
+  fin3d.position.set(0, -0.5, -18); g.add(fin3d);
+
+  // ── LEGS (legStrength=4, legSpikes=5) ───────────────────
+  function makeLeg2(sx, pz) {
+    var lg = new THREE.Group();
+    // Thigh
+    var thigh = new THREE.Mesh(new THREE.CylinderGeometry(1.0, 0.8, 5.0, 7), legMat);
+    thigh.rotation.z = sx*0.55; thigh.position.set(sx*2.2, -1, 0); thigh.castShadow = true; lg.add(thigh);
+    // Shin
+    var shin = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.5, 4.2, 6), legMat);
+    shin.position.set(sx*5.0, -4.8, 0); shin.rotation.z = -sx*0.85; shin.castShadow = true; lg.add(shin);
+    // Leg spikes (legSpikes=5 — 5 prominent spikes along shin)
+    for (var ls=0; ls<3; ls++) {
+      var lspike = new THREE.Mesh(new THREE.ConeGeometry(0.22-ls*0.04, 0.9+ls*0.2, 4), spikeMat);
+      lspike.rotation.z = sx*(Math.PI/2+0.2);
+      lspike.position.set(sx*(5.5+ls*0.3), -3-ls*0.8, 0.4); lg.add(lspike);
+    }
+    // Claws (4 prominent claws)
+    for (var cl=0; cl<4; cl++) {
+      var claw = new THREE.Mesh(new THREE.ConeGeometry(0.22, 1.6, 4), clawMat);
+      claw.rotation.z = sx*(Math.PI/2+(cl-1.5)*0.28);
+      claw.position.set(sx*7.2, -7, (cl-1.5)*0.8); lg.add(claw);
+    }
+    lg.position.set(0,-1.8,pz); return lg;
+  }
+  g.add(makeLeg2(1, 5*SIZE)); g.add(makeLeg2(-1, 5*SIZE));
+  g.add(makeLeg2(1, -4*SIZE)); g.add(makeLeg2(-1, -4*SIZE));
+
+  // ── EARTH MAGIC AURA (faint lime shimmer on body) ────────
+  var auraMat = new THREE.MeshBasicMaterial({
+    color: 0x5BF730, transparent: true, opacity: 0.04, side: THREE.DoubleSide
+  });
+  var aura = new THREE.Mesh(new THREE.SphereGeometry(6.5, 10, 8), auraMat);
+  aura.scale.set(1, 0.7, 1.4); g.add(aura);
+  g._aura = aura;
+
+  return g;
+}
+
+// ════════════════════════════════════════════════════════
 //  PLAYER DRAGON
 // ════════════════════════════════════════════════════════
-const pd = buildDragon(0x1A5F7A, 0x0D3349);
+const pd = buildGenomeDragon();
 // Start inside the spawn safe zone, landed on the ground
 var SPAWN_X = 0, SPAWN_Z = 0;
 var SPAWN_Y = terrainH(SPAWN_X, SPAWN_Z) + 5;
@@ -1447,6 +1806,39 @@ EGG_SPOTS.forEach(function(sp, idx) {
 });
 
 // ════════════════════════════════════════════════════════
+//  WEATHER — RAIN PARTICLES
+// ════════════════════════════════════════════════════════
+var RAIN_COUNT = 800;
+var rainGeo = new THREE.BufferGeometry();
+var rainPos = new Float32Array(RAIN_COUNT * 3);
+for (var ri = 0; ri < RAIN_COUNT; ri++) {
+  rainPos[ri*3]   = (Math.random()-0.5) * 600;
+  rainPos[ri*3+1] = Math.random() * 300;
+  rainPos[ri*3+2] = (Math.random()-0.5) * 600;
+}
+rainGeo.setAttribute('position', new THREE.BufferAttribute(rainPos, 3));
+var rainMesh = new THREE.Points(rainGeo, new THREE.PointsMaterial({
+  color: 0xAABBCC, size: 0.7, transparent: true, opacity: 0
+}));
+scene.add(rainMesh);
+
+// ════════════════════════════════════════════════════════
+//  BOOST FIRE TRAIL
+// ════════════════════════════════════════════════════════
+var trailGeo = new THREE.BufferGeometry();
+var TRAIL_LEN = 24;
+var trailPos = new Float32Array(TRAIL_LEN * 3);
+trailGeo.setAttribute('position', new THREE.BufferAttribute(trailPos, 3));
+var trailMesh = new THREE.Points(trailGeo, new THREE.PointsMaterial({
+  color: 0xFF6600, size: 2.8, transparent: true, opacity: 0,
+  vertexColors: false
+}));
+scene.add(trailMesh);
+var trailBuf = [];  // ring buffer of past positions
+for (var ti = 0; ti < TRAIL_LEN; ti++) trailBuf.push(new THREE.Vector3(0,-1000,0));
+var trailHead = 0;
+
+// ════════════════════════════════════════════════════════
 //  ENEMIES
 // ════════════════════════════════════════════════════════
 const enemies = [];
@@ -1463,8 +1855,16 @@ function spawnEnemy() {
   const mesh = buildDragon(cols[0], cols[1]);
   const sc = 0.7 + Math.random() * 0.3;
   mesh.scale.setScalar(sc);
-  const cx = (Math.random() - 0.5) * 1100;
-  const cz = (Math.random() - 0.5) * 1100;
+  // Retry spawn until outside all safe zones
+  let cx, cz, attempts = 0;
+  do {
+    cx = (Math.random() - 0.5) * 1100;
+    cz = (Math.random() - 0.5) * 1100;
+    attempts++;
+  } while (attempts < 20 && safeZones.some(function(sz) {
+    var dx = cx - sz.pos.x, dz = cz - sz.pos.z;
+    return Math.sqrt(dx*dx+dz*dz) < sz.radius + 60;
+  }));
   mesh.position.set(cx, 65 + Math.random() * 130, cz);
   scene.add(mesh);
   // Health bar DOM element
@@ -1487,6 +1887,37 @@ function spawnEnemy() {
 for (let i = 0; i < 6; i++) spawnEnemy();
 
 // ════════════════════════════════════════════════════════
+//  BOSS DRAGON
+// ════════════════════════════════════════════════════════
+function spawnBoss() {
+  if (boss && boss.alive) return; // only one at a time
+  var bMesh = buildDragon(0x1A0000, 0x000000);
+  bMesh.scale.setScalar(2.2); // massive
+  var bx, bz, ba = 0;
+  do { bx = (Math.random()-0.5)*800; bz = (Math.random()-0.5)*800; ba++; }
+  while (ba < 15 && safeZones.some(function(sz){ var d=Math.sqrt((bx-sz.pos.x)**2+(bz-sz.pos.z)**2); return d<sz.radius+80; }));
+  bMesh.position.set(bx, 120, bz);
+  scene.add(bMesh);
+  // Boss health bar
+  var bBar = document.createElement('div'); bBar.className='ebar';
+  bBar.style.width = '120px'; bBar.style.height = '10px';
+  bBar.style.border = '2px solid rgba(255,50,50,.5)';
+  var bFill = document.createElement('div'); bFill.className='ebar-f';
+  bFill.style.background = 'linear-gradient(90deg,#800000,#FF0000)';
+  bBar.appendChild(bFill);
+  document.getElementById('ebars').appendChild(bBar);
+  boss = {
+    mesh: bMesh, health: 20 + wave*3, maxHealth: 20 + wave*3,
+    cx: bx, cz: bz, alt: 120,
+    angle: Math.random()*Math.PI*2, radius: 100,
+    speed: 0.2 + wave*0.03, alive: true, hitTimer: 0,
+    fireCooldown: 40, bar: bBar, fill: bFill, isBoss: true
+  };
+  showWaveBanner('💀 BOSS DRAGON AWAKENS!');
+  sfxBoss();
+}
+
+// ════════════════════════════════════════════════════════
 //  BLASTS
 // ════════════════════════════════════════════════════════
 const blasts = [], eBlasts = [];
@@ -1495,9 +1926,10 @@ function fireBlast(dir) {
   const d = dir || new THREE.Vector3(0, 0, 1).applyQuaternion(pd.quaternion);
   const pos = pd.position.clone().add(d.clone().multiplyScalar(15)).add(new THREE.Vector3(0, 2, 0));
   const g = new THREE.Group();
-  g.add(new THREE.Mesh(new THREE.SphereGeometry(1.8, 8, 6), new THREE.MeshBasicMaterial({ color: 0xFF8C00 })));
-  g.add(new THREE.Mesh(new THREE.SphereGeometry(1.2, 7, 5), new THREE.MeshBasicMaterial({ color: 0xFFFF00 })));
-  g.add(new THREE.Mesh(new THREE.SphereGeometry(3.0, 8, 6), new THREE.MeshBasicMaterial({ color: 0xFF4400, transparent: true, opacity: 0.36 })));
+  // Earth+Fire magic = emerald-green fire
+  g.add(new THREE.Mesh(new THREE.SphereGeometry(1.8, 8, 6), new THREE.MeshBasicMaterial({ color: 0x44FF22 })));
+  g.add(new THREE.Mesh(new THREE.SphereGeometry(1.2, 7, 5), new THREE.MeshBasicMaterial({ color: 0xAAFF44 })));
+  g.add(new THREE.Mesh(new THREE.SphereGeometry(3.0, 8, 6), new THREE.MeshBasicMaterial({ color: 0x22AA00, transparent: true, opacity: 0.38 })));
   g.position.copy(pos); scene.add(g);
   blasts.push({ mesh: g, vel: d.clone().multiplyScalar(5.5), life: 90, maxLife: 90 });
   sfxFire();
@@ -1653,7 +2085,7 @@ function drawMinimap() {
   // Player arrow
   const pp = tp(pd.position.x, pd.position.z);
   mmCtx.save(); mmCtx.translate(pp[0], pp[1]); mmCtx.rotate(-pd.rotation.y);
-  mmCtx.fillStyle = 'rgba(100,200,255,.95)';
+  mmCtx.fillStyle = 'rgba(91,247,48,.95)'; // lime-green = genome dragon
   mmCtx.beginPath(); mmCtx.moveTo(0, -7); mmCtx.lineTo(4, 5); mmCtx.lineTo(-4, 5); mmCtx.closePath(); mmCtx.fill();
   mmCtx.restore();
   // Border ring
@@ -1691,7 +2123,7 @@ document.addEventListener('mousemove', function(e) {
   mouseY = Math.max(-0.75, Math.min(0.75, mouseY));
 });
 document.addEventListener('mousedown', function(e) {
-  if (e.button === 0 && gameOn && !landed && cooldown <= 0 && fireCharge >= 10) {
+  if (e.button === 0 && gameOn && !paused && !landed && cooldown <= 0 && fireCharge >= 10) {
     fireBlast(); cooldown = 22; fireCharge = Math.max(0, fireCharge - 30);
   }
 });
@@ -1776,7 +2208,7 @@ function setupBtn(id, onDown, onUp) {
 }
 
 setupBtn('btn-fire', function() {
-  if (gameOn && !landed && cooldown <= 0 && fireCharge >= 10) {
+  if (gameOn && !paused && !landed && cooldown <= 0 && fireCharge >= 10) {
     fireBlast(); cooldown = 22; fireCharge = Math.max(0, fireCharge - 30);
   }
 }, null);
@@ -1817,6 +2249,60 @@ let dayTime = 0;
 const velocity = new THREE.Vector3();
 let popTO = null, waveBTO = null;
 
+// XP / Level system
+let xp = 0, level = 1;
+const XP_PER_LEVEL = [0,100,220,380,580,820,1100,1420,1780,2180,2620]; // XP thresholds per level
+function xpForLevel(lvl){ return XP_PER_LEVEL[Math.min(lvl, XP_PER_LEVEL.length-1)] || (lvl*400); }
+function addXP(amount) {
+  xp += amount;
+  var threshold = xpForLevel(level);
+  if (xp >= threshold && level < 10 && threshold > 0) {
+    level++;
+    xp = 0;
+    // Stat boosts on level up
+    health = Math.min(100 + (level-1)*5, 150); // max HP increases
+    sfxLevelUp();
+    showPopup('🌟 LEVEL ' + level + '! Stats boosted!');
+    var luf = document.getElementById('level-up-flash');
+    luf.style.background = 'rgba(150,80,255,.45)'; luf.style.transition = 'none';
+    setTimeout(function(){ luf.style.background='rgba(150,80,255,0)'; luf.style.transition='background 1s'; }, 120);
+  }
+}
+
+// Hoop combo
+let hoopCombo = 0, hoopComboTimer = 0;
+const COMBO_WINDOW = 220; // frames (~3.6s at 60fps)
+
+// Weather
+let weatherType = 'clear'; // 'clear' | 'rain' | 'storm'
+let weatherTimer = 600;    // frames until next weather change
+let rainParticles = [];
+let lightningTimer = 0;
+
+// Boss
+let boss = null; // single boss dragon object
+
+// High score
+let hiScore = 0;
+try { hiScore = parseInt(localStorage.getItem('dragonRiderHi') || '0') || 0; } catch(e){}
+document.getElementById('hi-val').textContent = hiScore.toLocaleString();
+
+// Pause
+let paused = false;
+function togglePause() {
+  if (!gameOn) return;
+  paused = !paused;
+  document.getElementById('pause-screen').style.display = paused ? 'flex' : 'none';
+  document.getElementById('btn-pause').textContent = paused ? '▶' : '⏸';
+  if (paused) {
+    document.getElementById('pause-score').textContent = 'Score: ' + score.toLocaleString();
+    document.getElementById('pause-wave').textContent = 'Wave: ' + wave;
+    document.getElementById('pause-lvl').textContent = 'Dragon Level: ' + level;
+  }
+}
+window.togglePause = togglePause;
+document.addEventListener('keydown', function(e){ if(e.code==='Escape' && gameOn) togglePause(); });
+
 function showPopup(txt) {
   const el = document.getElementById('popup');
   if (popTO) clearTimeout(popTO);
@@ -1846,12 +2332,20 @@ function flashPickup() {
 }
 
 function checkWave() {
-  if (enemies.filter(function(e) { return e.alive; }).length === 0) {
+  var aliveCount = enemies.filter(function(e) { return e.alive; }).length;
+  var bossAlive = boss && boss.alive;
+  if (aliveCount === 0 && !bossAlive) {
     wave++;
     document.getElementById('wv').textContent = wave;
-    showWaveBanner('⚔ WAVE ' + wave + ' — ' + (3 + wave) + ' ENEMIES!');
+    // Every 3rd wave spawn a boss instead of regular wave
+    if (wave % 3 === 0) {
+      setTimeout(spawnBoss, 2500);
+      showWaveBanner('💀 WAVE ' + wave + ' — BOSS INCOMING!');
+    } else {
+      showWaveBanner('⚔ WAVE ' + wave + ' — ' + (3 + wave) + ' ENEMIES!');
+    }
     setTimeout(function() {
-      for (let i = 0; i < 3 + wave; i++) spawnEnemy();
+      if (wave % 3 !== 0) { for (let i = 0; i < 3 + wave; i++) spawnEnemy(); }
       for (let i = 0; i < 3; i++) {
         const a = Math.random() * Math.PI * 2, r = 80 + Math.random() * 300;
         const ox = pd.position.x + Math.cos(a) * r;
@@ -1872,16 +2366,30 @@ function dismissIntro() {
 function startGame() {
   document.getElementById('start').style.display = 'none';
   gameOn = true;
-  getAC(); // Unlock audio on user gesture
-  // Try pointer lock for desktop
+  getAC();
   try { renderer.domElement.requestPointerLock(); } catch(e) {}
-  // Auto-dismiss intro after 4.5 seconds
+  // Show dragon name intro for 3.5s
+  var dIntro = document.getElementById('dragon-intro');
+  dIntro.classList.add('show');
+  setTimeout(function(){ dIntro.style.transition='opacity 1.2s'; dIntro.style.opacity='0'; }, 3500);
+  setTimeout(function(){ dIntro.style.display='none'; }, 4800);
   setTimeout(dismissIntro, 4500);
 }
 function restartGame() {
   document.getElementById('dead').style.display = 'none';
   score = 0; health = 100; kills = 0; wave = 1; fireCharge = 100;
-  cooldown = 0; landed = false; tryLand = false;
+  cooldown = 0; landed = true; tryLand = false;
+  xp = 0; level = 1; hoopCombo = 0; hoopComboTimer = 0;
+  // Hide any lingering intro overlay
+  var introOv = document.getElementById('intro-overlay');
+  if (introOv) { introOv.classList.add('hidden'); introOv.style.display = 'none'; }
+  // Reset level UI
+  document.getElementById('lvl-num').textContent = '1';
+  document.getElementById('xp-num').textContent = '0';
+  document.getElementById('xp-bar-fill').style.width = '0%';
+  weatherType = 'clear'; weatherTimer = 600;
+  if (boss && boss.alive) { scene.remove(boss.mesh); if(boss.bar) boss.bar.remove(); }
+  boss = null;
   velocity.set(0, 0, 0); pd.position.set(0, 90, 0); pd.rotation.set(0, 0, 0);
   // Remove old enemies
   enemies.forEach(function(e) {
@@ -1889,6 +2397,11 @@ function restartGame() {
     if (e.bar) e.bar.remove();
   });
   enemies.length = 0;
+  // Clear any in-flight blasts
+  blasts.forEach(function(b){ scene.remove(b.mesh); }); blasts.length = 0;
+  eBlasts.forEach(function(b){ scene.remove(b.mesh); }); eBlasts.length = 0;
+  // Clear particles
+  particles.forEach(function(p){ scene.remove(p.mesh); }); particles.length = 0;
   for (let i = 0; i < 6; i++) spawnEnemy();
   // Reset treasures
   treasures.forEach(function(tr) { tr.active = true; tr.mesh.visible = true; });
@@ -1902,6 +2415,15 @@ function restartGame() {
   pd.position.set(SPAWN_X, SPAWN_Y, 0); landed = true;
   document.getElementById('quest').style.filter = '';
   document.getElementById('wv').textContent = '1';
+  document.getElementById('sv').textContent = '0';
+  document.getElementById('kv').textContent = '0';
+  document.getElementById('hi-val').textContent = hiScore.toLocaleString();
+  document.getElementById('hp-fill').style.width = '100%';
+  document.getElementById('hpn').textContent = '100/100';
+  document.getElementById('fire-fill').style.width = '100%';
+  document.getElementById('firn').textContent = 'Ready';
+  document.getElementById('combo').style.opacity = '0';
+  document.getElementById('brow').style.opacity = '0';
   gameOn = true;
   try { renderer.domElement.requestPointerLock(); } catch(e) {}
 }
@@ -1929,6 +2451,13 @@ function animate() {
   dayTime   = (dayTime + dt * 0.006) % 1;
 
   if (!gameOn) { renderer.render(scene, camera); return; }
+  if (paused) { renderer.render(scene, camera); return; }
+
+  // ── SAFE ZONE CHECK (hoisted — needed before damage) ─
+  var inSafe = false;
+  safeZones.forEach(function(sz) {
+    if (pd.position.distanceTo(sz.pos) < sz.radius) inSafe = true;
+  });
 
   // ── DAY / NIGHT ──────────────────────────────────────
   const dn = Math.sin(dayTime * Math.PI * 2) * 0.5 + 0.5;
@@ -1943,10 +2472,10 @@ function animate() {
   moon.material.opacity  = Math.max(0, 1 - dn * 3);
 
   // ── COMBINED INPUT (keyboard + joystick) ─────────────
-  // Joystick axes: -1..1. Deadzone 0.18 so resting thumb doesn't drift.
-  const JDZ = 0.18;
-  const lax = Math.abs(joyL.ax) > JDZ ? joyL.ax : 0;
-  const lay = Math.abs(joyL.ay) > JDZ ? joyL.ay : 0;
+  // Large deadzone — resting thumb never drifts
+  const JDZ = 0.25;
+  const lax = Math.abs(joyL.ax) > JDZ ? (joyL.ax - Math.sign(joyL.ax) * JDZ) / (1 - JDZ) : 0;
+  const lay = Math.abs(joyL.ay) > JDZ ? (joyL.ay - Math.sign(joyL.ay) * JDZ) / (1 - JDZ) : 0;
 
   const kTurnLeft  = K['KeyA'] || K['ArrowLeft'];
   const kTurnRight = K['KeyD'] || K['ArrowRight'];
@@ -1957,24 +2486,23 @@ function animate() {
   // Combine: keyboard gives ±1, joystick gives analogue -1..1
   const turnAmt  = (kTurnLeft ? 1 : 0) - (kTurnRight ? 1 : 0) + (-lax);
   const pitchAmt = (kPitchUp  ? 1 : 0) - (kPitchDown ? 1 : 0) + (-lay);
-  // Clamp to -1..1
   const tA = Math.max(-1, Math.min(1, turnAmt));
   const pA = Math.max(-1, Math.min(1, pitchAmt));
 
-  // Right joystick -> camera look (very slow, smooth)
-  const RDZ = 0.14;
-  const rax = Math.abs(joyR.ax) > RDZ ? joyR.ax : 0;
-  const ray = Math.abs(joyR.ay) > RDZ ? joyR.ay : 0;
+  // Right joystick -> camera look — large deadzone, very slow accumulation
+  const RDZ = 0.25;
+  const rax = Math.abs(joyR.ax) > RDZ ? (joyR.ax - Math.sign(joyR.ax) * RDZ) / (1 - RDZ) : 0;
+  const ray = Math.abs(joyR.ay) > RDZ ? (joyR.ay - Math.sign(joyR.ay) * RDZ) / (1 - RDZ) : 0;
   const rjoyActive = joyR.active && (rax !== 0 || ray !== 0);
   if (rjoyActive) {
-    mouseX += rax * 0.008;
-    mouseY += ray * 0.008;
-    mouseY = Math.max(-0.6, Math.min(0.6, mouseY));
+    mouseX += rax * 0.005;
+    mouseY += ray * 0.005;
+    mouseY = Math.max(-0.5, Math.min(0.5, mouseY));
   }
 
   // Auto-land approach if tryLand
   if (tryLand && !landed) {
-    pd.rotation.x = Math.min(pd.rotation.x + 0.008, 0.25);
+    pd.rotation.x = Math.min(pd.rotation.x + 0.006, 0.2);
     const tyl2 = terrainH(pd.position.x, pd.position.z);
     if (pd.position.y < tyl2 + 14) {
       landed = true; tryLand = false; pd.position.y = tyl2 + 5;
@@ -1984,32 +2512,37 @@ function animate() {
 
   if (!landed) {
     // ── FLIGHT ──────────────────────────────────────────
-    // Base turn/pitch rates — low for joystick comfort
-    const BASE_YR = 0.013; // yaw rate per frame
-    const BASE_PR = 0.010; // pitch rate per frame
+    // Very gentle rates — easy to hold a course, no twitching
+    const BASE_YR = 0.009; // yaw  — about 0.5°/frame
+    const BASE_PR = 0.007; // pitch — about 0.4°/frame
 
     pd.rotation.y += tA * BASE_YR;
-    pd.rotation.x  = Math.max(-Math.PI / 3.2,
-                       Math.min( Math.PI / 3.2,
+    // Pitch limit ±20° — hard to accidentally dive straight down
+    pd.rotation.x  = Math.max(-Math.PI / 9,
+                       Math.min( Math.PI / 9,
                          pd.rotation.x - pA * BASE_PR));
 
-    // Mouse / right joystick camera look
-    if (locked || rjoyActive) {
-      pd.rotation.y -= mouseX * 0.22;
-      pd.rotation.x -= mouseY * 0.18;
-      pd.rotation.x = Math.max(-Math.PI / 3, Math.min(Math.PI / 3, pd.rotation.x));
-      // Slow decay so it glides to a stop, not snaps
-      mouseX *= 0.90; mouseY *= 0.90;
+    // Auto-level: when stick released, pitch gently returns to 0
+    if (Math.abs(pA) < 0.05) {
+      pd.rotation.x *= 0.97; // drifts back to level in ~1 second
     }
 
-    // Banking roll — gentle, follows turn amount
-    pd.rotation.z += (tA * 0.28 - pd.rotation.z) * 0.04;
+    // Mouse / right joystick — very gentle, slow decay
+    if (locked || rjoyActive) {
+      pd.rotation.y -= mouseX * 0.14;
+      pd.rotation.x -= mouseY * 0.10;
+      pd.rotation.x = Math.max(-Math.PI / 9, Math.min(Math.PI / 9, pd.rotation.x));
+      mouseX *= 0.93; mouseY *= 0.93;
+    }
 
-    // Forward speed — gentle acceleration
-    const spd = boost ? 3.8 : 1.8;
+    // Banking roll — very subtle lean
+    pd.rotation.z += (tA * 0.18 - pd.rotation.z) * 0.04;
+
+    // Speed — comfortable cruise, meaningful boost
+    const spd = boost ? 4.2 : 2.4;
     document.getElementById('brow').style.opacity = boost ? '0.9' : '0';
     const fwd = new THREE.Vector3(0, 0, 1).applyQuaternion(pd.quaternion);
-    velocity.lerp(fwd.multiplyScalar(spd), 0.04);
+    velocity.lerp(fwd.multiplyScalar(spd), 0.05);
     pd.position.add(velocity);
 
     // Terrain bounce
@@ -2017,12 +2550,12 @@ function animate() {
     if (pd.position.y < ty + 9) { pd.position.y = ty + 9; if (velocity.y < 0) velocity.y = 0.35; }
 
     // Fire (keyboard) — only when flying
-    if ((K['Space']) && !landed && cooldown <= 0 && fireCharge >= 10) {
+    if ((K['Space']) && !paused && !landed && cooldown <= 0 && fireCharge >= 10) {
       fireBlast(); cooldown = 22; fireCharge = Math.max(0, fireCharge - 30);
     }
 
     // Land (keyboard)
-    if (K['KeyL']) {
+    if (K['KeyL'] && !paused) {
       const tyl = terrainH(pd.position.x, pd.position.z);
       if (pd.position.y < tyl + 35) {
         landed = true; pd.position.y = tyl + 5;
@@ -2035,7 +2568,25 @@ function animate() {
     const fv = Math.sin(wingT) * fa;
     pd.rightWingGroup.rotation.z = fv;
     pd.leftWingGroup.rotation.z  = -fv;
+    // Earth magic aura pulse
+    if (pd._aura) {
+      pd._aura.material.opacity = 0.03 + Math.sin(t * 1.8) * 0.015;
+      if (inSafe) pd._aura.material.opacity += 0.04; // brighter in safe zone
+    }
 
+    // Head gentle tracking bob
+    if (pd.headGroup) {
+      pd.headGroup.rotation.x = Math.sin(t * 0.7) * 0.04;
+      // Nose fire glow flicker — find nostril children (MeshBasicMaterial color 0xFF6622)
+      pd.headGroup.children.forEach(function(ch) {
+        if (ch.material && ch.material.color && ch.material.transparent) {
+          var hsl = {}; ch.material.color.getHSL(hsl);
+          if (hsl.h > 0.03 && hsl.h < 0.12) { // orange-red hue = nostril
+            ch.material.opacity = 0.6 + Math.sin(t * 8 + 1.2) * 0.25;
+          }
+        }
+      });
+    }
     // Camera follow
     const camOff = new THREE.Vector3(0, 10, -30).applyQuaternion(pd.quaternion);
     camera.position.lerp(pd.position.clone().add(camOff), 0.1);
@@ -2059,7 +2610,7 @@ function animate() {
     pd.rightWingGroup.rotation.z = fv2;
     pd.leftWingGroup.rotation.z  = -fv2;
 
-    if (K['KeyF'] || K['Space']) { landed = false; velocity.set(0, 3, 0); }
+    if ((K['KeyF'] || K['Space']) && !paused) { landed = false; velocity.set(0, 3, 0); }
 
     // Ground camera
     const cx = pd.position.x - Math.sin(pd.rotation.y) * 26;
@@ -2112,7 +2663,7 @@ function animate() {
       e.fireCooldown = 70 + Math.floor(Math.random() * 90) - Math.min(25, wave * 3);
     }
     // Melee damage
-    if (e.mesh.position.distanceTo(pd.position) < 18 && !landed) {
+    if (e.mesh.position.distanceTo(pd.position) < 18 && !landed && !inSafe) {
       health = Math.max(0, health - 0.25); flashDamage();
     }
   });
@@ -2122,7 +2673,7 @@ function animate() {
     const b = blasts[i];
     b.mesh.position.add(b.vel); b.life--;
     b.mesh.scale.setScalar(b.life / b.maxLife * 0.6 + 0.4);
-    b.mesh.children[0].material.color.setHSL(0.07 + Math.random() * 0.04, 1, 0.55);
+    b.mesh.children[0].material.color.setHSL(0.28 + Math.random() * 0.06, 1, 0.55); // green fire flicker
     if (b.mesh.position.y < terrainH(b.mesh.position.x, b.mesh.position.z) || b.life <= 0) {
       scene.remove(b.mesh); blasts.splice(i, 1); continue;
     }
@@ -2132,10 +2683,21 @@ function animate() {
       if (b.mesh.position.distanceTo(e.mesh.position) < 11) {
         e.health--; e.hitTimer = 14; hit = true;
         if (e.health <= 0) {
-          e.alive = false; explodeAt(e.mesh.position.clone(), true);
+          e.alive = false;
+          explodeAt(e.mesh.position.clone(), true);
+          // Earth+Fire dragon: green ember burst
+          for (var gi=0; gi<10; gi++) {
+            var gp = new THREE.Mesh(new THREE.SphereGeometry(0.6+Math.random()*.8,5,4),
+              new THREE.MeshBasicMaterial({color:0x44FF22,transparent:true,opacity:0.9}));
+            gp.position.copy(e.mesh.position);
+            var gv = new THREE.Vector3((Math.random()-.5)*6,Math.random()*4+1,(Math.random()-.5)*6);
+            scene.add(gp); particles.push({mesh:gp,vel:gv,life:40+Math.random()*15,sw:false,bl:0});
+          }
           scene.remove(e.mesh); if (e.bar) e.bar.style.display = 'none';
           kills++; score += 500 * wave;
-          showPopup('🔥 +' + (500 * wave) + ' SLAIN!'); checkWave();
+          addXP(50 * wave);
+          hoopCombo = 0; // reset hoop combo on kill
+          showPopup('🔥 +' + (500*wave) + ' SLAIN!'); checkWave();
         } else { showPopup('💥 HIT!'); }
       }
     });
@@ -2150,9 +2712,12 @@ function animate() {
     if (b.mesh.position.y < terrainH(b.mesh.position.x, b.mesh.position.z) || b.life <= 0) {
       scene.remove(b.mesh); eBlasts.splice(i, 1); continue;
     }
+    // Destroy blast if it enters any safe zone
+    var blastInSafe = false;
+    safeZones.forEach(function(sz){ if(b.mesh.position.distanceTo(sz.pos) < sz.radius) blastInSafe = true; });
+    if (blastInSafe) { scene.remove(b.mesh); eBlasts.splice(i, 1); continue; }
     if (b.mesh.position.distanceTo(pd.position) < 10) {
-      health = Math.max(0, health - 8);
-      flashDamage();
+      if (!inSafe) { health = Math.max(0, health - 8); flashDamage(); }
       explodeAt(b.mesh.position.clone(), false);
       scene.remove(b.mesh); eBlasts.splice(i, 1);
     }
@@ -2174,7 +2739,27 @@ function animate() {
     if (!h.active) return;
     if (pd.position.distanceTo(h.pos) < 13) {
       h.active = false; h.mesh.visible = false;
-      score += 100; showPopup('⭐ +100 HOOP!'); sfxHoop();
+      hoopComboTimer = COMBO_WINDOW;
+      hoopCombo++;
+      var mult = Math.min(hoopCombo, 8);
+      var pts = 100 * mult;
+      score += pts;
+      addXP(15 * mult);
+      // Earth magic sparkle on hoop
+      for (var hi=0; hi<6; hi++) {
+        var hp = new THREE.Mesh(new THREE.SphereGeometry(0.5+Math.random()*0.4,5,4),
+          new THREE.MeshBasicMaterial({color:new THREE.Color().setHSL(0.28+Math.random()*0.08,1,0.6),transparent:true,opacity:1}));
+        hp.position.copy(h.pos);
+        var hv = new THREE.Vector3((Math.random()-.5)*3,Math.random()*3,(Math.random()-.5)*3);
+        scene.add(hp); particles.push({mesh:hp,vel:hv,life:30+Math.random()*20,sw:false,bl:0});
+      }
+      var prevHealth = health;
+      health = Math.min(100 + (level-1)*5, health + 10);
+      var actualHeal = Math.round(health - prevHealth);
+      var comboStr = hoopCombo > 1 ? ' ×' + hoopCombo + ' COMBO!' : (actualHeal > 0 ? '  💚+' + actualHeal : '!');
+      showPopup('⭐ +' + pts + comboStr);
+      if (hoopCombo > 1) sfxCombo(hoopCombo);
+      else sfxHoop();
       setTimeout(function() { h.active = true; h.mesh.visible = true; }, 9000);
     }
   });
@@ -2186,7 +2771,7 @@ function animate() {
     p.mesh.position.y = p.pos.y + Math.sin(t * 2 + p.pos.x) * 0.8;
     if (pd.position.distanceTo(p.mesh.position) < 7) {
       p.active = false; p.mesh.visible = false;
-      if (p.type === 'hp') { health = Math.min(100, health + 35); showPopup('💊 +35 HP!'); }
+      if (p.type === 'hp') { var maxHP2 = 100 + (level-1)*5; health = Math.min(maxHP2, health + 35); showPopup('💊 +35 HP!'); }
       else                 { fireCharge = Math.min(100, fireCharge + 60); showPopup('🔥 FIRE +60!'); }
       flashPickup(); sfxPickup();
       setTimeout(function() {
@@ -2245,6 +2830,7 @@ function animate() {
     if (pd.position.distanceTo(eg.mesh.position) < collectR) {
       eg.active = false; eg.mesh.visible = false;
       score += eg.value;
+      addXP(30 + eg.rarity * 15);
       sfxEggCollect();
       var eggNames = ['Green','Purple','Orange','Blue','Rare Red'];
       showPopup('🥚 ' + eggNames[eg.rarity] + ' Egg! +' + eg.value);
@@ -2341,6 +2927,7 @@ function animate() {
     if (pd.position.distanceTo(tr.mesh.position) < collectR) {
       tr.active = false; tr.mesh.visible = false;
       score += tr.value;
+      addXP(40);
       sfxTreasure();
       showPopup('💰 +' + tr.value + ' TREASURE!');
       // Flash gold screen
@@ -2352,16 +2939,17 @@ function animate() {
   });
 
   // ── SAFE ZONES ───────────────────────────────────────
-  var inSafe = false;
+  // (inSafe already computed above; update animations + healing here)
   safeZones.forEach(function(sz) {
     sz.cap.rotation.y += dt * 0.8;
     sz.beam.rotation.y += dt * 0.15;
     sz.light.intensity = 0.9 + Math.sin(t * 1.5 + sz.pos.x) * 0.35;
     var dSafe = pd.position.distanceTo(sz.pos);
     if (dSafe < sz.radius) {
-      inSafe = true;
-      // Heal player slowly
-      health = Math.min(100, health + dt * 4);
+      // inSafe already set by hoisted check above
+      // Heal player slowly — use level-aware max HP
+      var maxHP = 100 + (level - 1) * 5;
+      health = Math.min(maxHP, health + dt * 5);
       // Ring pulse
       sz.mesh.children.forEach(function(c) {
         if (c.geometry && c.geometry.type === 'TorusGeometry') {
@@ -2387,6 +2975,17 @@ function animate() {
         e.fireCooldown = Math.max(e.fireCooldown, 90); // suppress fire
       }
     });
+    // Push boss away from safe zone too
+    if (boss && boss.alive) {
+      safeZones.forEach(function(sz) {
+        var d = boss.mesh.position.distanceTo(sz.pos);
+        if (d < sz.radius + 50) {
+          var pushDir = boss.mesh.position.clone().sub(sz.pos).normalize();
+          boss.mesh.position.addScaledVector(pushDir, 2.5);
+          boss.fireCooldown = Math.max(boss.fireCooldown, 90);
+        }
+      });
+    }
     if (!window._lastInSafe) { sfxSafeZone(); window._lastInSafe = true; }
   } else {
     window._lastInSafe = false;
@@ -2404,12 +3003,169 @@ function animate() {
     if (c.mesh.position.x < -1550) c.mesh.position.x =  1550;
   });
 
+  // ── WEATHER ──────────────────────────────────────────
+  if (!paused) {
+    weatherTimer--;
+    if (weatherTimer <= 0) {
+      var roll = Math.random();
+      weatherType = roll < 0.5 ? 'clear' : roll < 0.82 ? 'rain' : 'storm';
+      weatherTimer = 400 + Math.floor(Math.random() * 500);
+      if (weatherType === 'storm') showWaveBanner('⛈ STORM APPROACHING!');
+    }
+    var wOvEl = document.getElementById('weather-overlay');
+    if (weatherType === 'clear') {
+      wOvEl.style.background = 'rgba(30,40,60,0)';
+      rainMesh.material.opacity = Math.max(0, rainMesh.material.opacity - dt * 0.8);
+    } else if (weatherType === 'rain') {
+      wOvEl.style.background = 'rgba(30,40,60,0.15)';
+      rainMesh.material.opacity = Math.min(0.55, rainMesh.material.opacity + dt * 0.5);
+    } else { // storm
+      wOvEl.style.background = 'rgba(20,25,50,0.32)';
+      rainMesh.material.opacity = Math.min(0.85, rainMesh.material.opacity + dt * 0.8);
+      // Lightning every ~4-8s during storm
+      lightningTimer--;
+      if (lightningTimer <= 0) {
+        lightningTimer = 180 + Math.floor(Math.random() * 300);
+        var lf = document.getElementById('lightning-flash');
+        lf.style.background = 'rgba(200,220,255,.6)'; lf.style.transition = 'none';
+        setTimeout(function(){lf.style.background='rgba(200,220,255,0)'; lf.style.transition='background .3s';}, 60);
+        sfxLightning();
+        // Stun enemies briefly during lightning
+        enemies.forEach(function(e){ if(e.alive) e.fireCooldown = Math.max(e.fireCooldown, 45); });
+      }
+    }
+    // Move rain relative to player
+    if (rainMesh.material.opacity > 0.01) {
+      var rPos = rainGeo.attributes.position;
+      var spread = 280;
+      for (var ri2 = 0; ri2 < RAIN_COUNT; ri2++) {
+        var ry = rPos.getY(ri2) - dt * 130;
+        if (ry < pd.position.y - 40) {
+          // Reset this drop to random position above player
+          rPos.setX(ri2, pd.position.x + (Math.random()-0.5)*spread);
+          ry = pd.position.y + 220 + Math.random() * 60;
+          rPos.setZ(ri2, pd.position.z + (Math.random()-0.5)*spread);
+        }
+        rPos.setY(ri2, ry);
+      }
+      rPos.needsUpdate = true;
+    }
+  }
+
+  // ── BOOST FIRE TRAIL ─────────────────────────────────
+  var isBoosting = K['ShiftLeft'] || K['ShiftRight'] || boostHeld;
+  if (!landed && isBoosting) {
+    trailBuf[trailHead] = pd.position.clone().add(new THREE.Vector3(0,-1,-8).applyQuaternion(pd.quaternion));
+    trailHead = (trailHead + 1) % TRAIL_LEN;
+    var tPos2 = trailGeo.attributes.position;
+    for (var ti2 = 0; ti2 < TRAIL_LEN; ti2++) {
+      var tp = trailBuf[(trailHead + ti2) % TRAIL_LEN];
+      tPos2.setXYZ(ti2, tp.x, tp.y, tp.z);
+    }
+    tPos2.needsUpdate = true;
+    trailMesh.material.opacity = Math.min(0.75, trailMesh.material.opacity + dt * 4);
+    // Colour cycles orange→yellow
+    trailMesh.material.color.setHSL(0.28 + Math.sin(t*8)*0.04, 1, 0.55); // lime-green fire trail
+  } else {
+    trailMesh.material.opacity = Math.max(0, trailMesh.material.opacity - dt * 3);
+  }
+
+  // ── BOSS ─────────────────────────────────────────────
+  if (boss && boss.alive && !paused) {
+    boss.angle += dt * boss.speed;
+    // Boss aggressively tracks player
+    var bToP = new THREE.Vector3(pd.position.x - boss.cx, 0, pd.position.z - boss.cz);
+    var bDist = bToP.length();
+    if (bDist > 30) {
+      var bn = bToP.normalize();
+      boss.cx += bn.x * dt * boss.speed * 22;
+      boss.cz += bn.z * dt * boss.speed * 22;
+    }
+    boss.mesh.position.set(
+      boss.cx + Math.cos(boss.angle) * boss.radius,
+      boss.alt + Math.sin(t * 0.6 + boss.angle) * 18,
+      boss.cz + Math.sin(boss.angle) * boss.radius
+    );
+    boss.mesh.rotation.y = -boss.angle + Math.PI / 2;
+    if (boss.mesh.rightWingGroup) {
+      var bev = Math.sin(wingT * 0.9) * 0.6;
+      boss.mesh.rightWingGroup.rotation.z = bev;
+      boss.mesh.leftWingGroup.rotation.z = -bev;
+    }
+    if (boss.hitTimer > 0) {
+      boss.hitTimer--;
+      boss.mesh.traverse(function(ch){ if(ch.isMesh&&ch.material&&ch.material.emissive) ch.material.emissive.set(0.9,0,0); });
+    } else {
+      boss.mesh.traverse(function(ch){ if(ch.isMesh&&ch.material&&ch.material.emissive) ch.material.emissive.setScalar(0); });
+    }
+    // Boss fires 3x faster and with spread
+    boss.fireCooldown--;
+    if (boss.fireCooldown <= 0 && boss.mesh.position.distanceTo(pd.position) < 600) {
+      // Fire 3 blasts in spread
+      for (var bs = -1; bs <= 1; bs++) {
+        (function(spread){
+          var dir = pd.position.clone().sub(boss.mesh.position).normalize();
+          dir.x += spread * 0.15; dir.normalize();
+          var pos2 = boss.mesh.position.clone().add(dir.clone().multiplyScalar(20)).add(new THREE.Vector3(0,4,0));
+          var bg = new THREE.Group();
+          bg.add(new THREE.Mesh(new THREE.SphereGeometry(2.0,7,5), new THREE.MeshBasicMaterial({color:0xFF2200})));
+          bg.add(new THREE.Mesh(new THREE.SphereGeometry(3.2,7,5), new THREE.MeshBasicMaterial({color:0x880000,transparent:true,opacity:0.4})));
+          bg.position.copy(pos2); scene.add(bg);
+          eBlasts.push({mesh:bg, vel:dir.clone().multiplyScalar(5+wave*0.15), life:120});
+        })(bs);
+      }
+      boss.fireCooldown = 35;
+    }
+    // Check boss hit by player blasts
+    for (var bi2 = blasts.length-1; bi2 >= 0; bi2--) {
+      if (blasts[bi2].mesh.position.distanceTo(boss.mesh.position) < 20) {
+        boss.health -= 1; boss.hitTimer = 14;
+        scene.remove(blasts[bi2].mesh); blasts.splice(bi2, 1);
+        if (boss.health <= 0) {
+          boss.alive = false;
+          explodeAt(boss.mesh.position.clone(), true);
+          explodeAt(boss.mesh.position.clone().add(new THREE.Vector3(8,5,0)), true);
+          explodeAt(boss.mesh.position.clone().add(new THREE.Vector3(-8,5,0)), true);
+          scene.remove(boss.mesh); if(boss.bar) boss.bar.style.display='none';
+          var bPts = 2500 * wave;
+          score += bPts; kills++; addXP(200);
+          showPopup('💀 BOSS SLAIN! +' + bPts);
+          sfxBoom();
+          checkWave();
+        }
+        break;
+      }
+    }
+    // Melee
+    if (boss.mesh.position.distanceTo(pd.position) < 30 && !landed && !inSafe) {
+      health = Math.max(0, health - 0.6); flashDamage();
+    }
+    // Update boss health bar
+    if (boss.bar) {
+      var vp2 = boss.mesh.position.clone().project(camera);
+      if (vp2.z < 1) {
+        var bsx = innerWidth/2+vp2.x*innerWidth/2, bsy = innerHeight/2-vp2.y*innerHeight/2;
+        boss.bar.style.display='block'; boss.bar.style.left=bsx+'px'; boss.bar.style.top=(bsy-50)+'px';
+        boss.fill.style.width = (boss.health/boss.maxHealth*100)+'%';
+      } else boss.bar.style.display='none';
+    }
+  }
+
+  // ── COMBO TIMER ──────────────────────────────────────
+  if (hoopComboTimer > 0) {
+    hoopComboTimer--;
+    if (hoopComboTimer <= 0) hoopCombo = 0;
+  }
+
   // ── DEATH ────────────────────────────────────────────
   if (health <= 0 && gameOn) {
     gameOn = false;
     explodeAt(pd.position.clone(), true);
-    document.getElementById('ds').textContent = 'Final Score: ' + score.toLocaleString();
-    document.getElementById('dk').textContent = 'Dragons Slain: ' + kills + '  |  Wave: ' + wave;
+    document.getElementById('ds').textContent = 'Final Score: ' + score.toLocaleString() + '  |  Best: ' + Math.max(score,hiScore).toLocaleString();
+    document.getElementById('dk').textContent = 'Dragons Slain: ' + kills + '  |  Wave: ' + wave + '  |  Level: ' + level;
+    paused = false;
+    document.getElementById('pause-screen').style.display = 'none';
+    document.getElementById('btn-pause').textContent = '⏸';
     setTimeout(function() { document.getElementById('dead').style.display = 'flex'; }, 1300);
   }
 
@@ -2429,9 +3185,10 @@ function animate() {
   var safeLabel = (typeof inSafe !== 'undefined' && inSafe) ? ' &nbsp;⛨ SAFE' : '';
   var caveLabel = (typeof inCave !== 'undefined' && inCave) ? ' &nbsp;🏔 CAVE' : '';
   var babyLabel = babyDragons.length > 0 ? ' &nbsp;🐣×' + babyDragons.length : '';
+  var wxLabel = weatherType === 'storm' ? ' &nbsp;⛈' : weatherType === 'rain' ? ' &nbsp;🌧' : '';
   modeEl.innerHTML = landed
     ? '🦎 <b>Exploring</b>' + caveLabel + safeLabel + babyLabel
-    : '🐉 <b>Flying</b> — Wave ' + wave + safeLabel + babyLabel;
+    : '🐉 <b>Flying</b> — Wave ' + wave + safeLabel + babyLabel + wxLabel;
 
   // Treasure quest HUD
   var tTotal = treasures.length;
@@ -2451,11 +3208,56 @@ function animate() {
     document.getElementById('quest').style.filter = 'drop-shadow(0 0 12px gold)';
   }
 
-  // Low-health vignette pulse
+  // XP / Level HUD
+  var xpThresh = xpForLevel(level);
+  document.getElementById('lvl-num').textContent = level;
+  if (level >= 10) {
+    document.getElementById('xp-num').textContent = 'MAX';
+    document.getElementById('xp-max').textContent = '';
+    document.getElementById('xp-bar-fill').style.width = '100%';
+    document.getElementById('xp-label').textContent = '🌟 MAX LEVEL — Dragon Mastered!';
+  } else {
+    document.getElementById('xp-num').textContent = xp;
+    document.getElementById('xp-max').textContent = xpThresh;
+    document.getElementById('xp-bar-fill').style.width = (xp / xpThresh * 100).toFixed(1) + '%';
+  }
+
+  // Combo display
+  var comboEl = document.getElementById('combo');
+  if (hoopComboTimer > 0 && hoopCombo > 1) {
+    comboEl.textContent = '🔥 ×' + hoopCombo + ' COMBO';
+    var fadeRatio = hoopComboTimer / COMBO_WINDOW;
+    comboEl.style.opacity = Math.min(1, fadeRatio * 3).toString();
+    comboEl.style.transform = 'translateX(-50%) scale(' + (1 + (1-fadeRatio) * 0.1) + ')';
+  } else {
+    comboEl.style.opacity = '0';
+  }
+
+  // High score
+  if (score > hiScore) {
+    hiScore = score;
+    try { localStorage.setItem('dragonRiderHi', hiScore); } catch(e){}
+    document.getElementById('hi-val').textContent = hiScore.toLocaleString();
+  }
+
+  // Weather tint on health bar during storm
+  if (weatherType === 'storm') {
+    document.getElementById('hp-fill').style.background = 'linear-gradient(90deg,#992255,#ff3366)';
+  } else {
+    document.getElementById('hp-fill').style.background = 'linear-gradient(90deg,#ff3030,#ff7030)';
+  }
+
+  // Vignette — red when low health, teal glow when in safe zone
   const lv = Math.max(0, (30 - health) / 30);
-  document.getElementById('vig').style.background = lv > 0
-    ? 'radial-gradient(ellipse at center,transparent 38%,rgba(180,0,0,' + (lv * 0.6 + Math.sin(t * 4) * 0.05) + ') 100%)'
-    : 'none';
+  if (typeof inSafe !== 'undefined' && inSafe) {
+    document.getElementById('vig').style.background =
+      'radial-gradient(ellipse at center,transparent 45%,rgba(0,200,140,' + (0.12 + Math.sin(t*1.5)*0.04) + ') 100%)';
+  } else if (lv > 0) {
+    document.getElementById('vig').style.background =
+      'radial-gradient(ellipse at center,transparent 38%,rgba(180,0,0,' + (lv * 0.6 + Math.sin(t * 4) * 0.05) + ') 100%)';
+  } else {
+    document.getElementById('vig').style.background = 'none';
+  }
 
   drawMinimap();
   updateEnemyBars();
